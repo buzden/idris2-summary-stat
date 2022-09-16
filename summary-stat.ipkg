@@ -1,0 +1,11 @@
+package summary-stat
+
+version = 0.1.0
+
+authors = "Denis Buzdalov"
+
+brief = "Facilities for summary statistics"
+
+-- modules =
+
+sourcedir = "src"
