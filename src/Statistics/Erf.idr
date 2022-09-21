@@ -1,9 +1,6 @@
-module Data.Statistics.Erf
+module Statistics.Erf
 
-import Data.DPair
-import Data.Double.Bounded
-
-import Data.Statistics.Probability
+import Statistics.Probability
 
 %default total
 

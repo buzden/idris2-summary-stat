@@ -1,4 +1,4 @@
-module Data.Statistics.Probability
+module Statistics.Probability
 
 import public Data.Double.Bounded
 
