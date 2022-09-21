@@ -75,3 +75,13 @@ inv $ P x = P (1 - x) @{believe_me Oh}
 public export %inline
 (.inv) : Probability -> Probability
 (.inv) = inv
+
+--- Comparison operations ---
+
+public export
+Eq Probability where
+  P x == P y = x == y
+
+public export
+Ord Probability where
+  compare (P x) (P y) = compare x y
