@@ -8,7 +8,7 @@ import public Data.So
 
 public export
 inProbBounds : Double -> Bool
-inProbBounds x = x >= 0 && x <= 1
+inProbBounds x = 0 <= x && x <= 1
 
 public export
 data Probability : Type where
