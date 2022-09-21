@@ -1,34 +1,24 @@
 module Data.Statistics.Erf
 
-import Data.Statistics.Probability
-
 import Data.DPair
+import Data.Double.Bounded
+
+import Data.Statistics.Probability
 
 %default total
 
---- Algebra on bounded doubles ---
-
-namespace BoundedDoubles
-
-  export
-  (/) : Subset Double (\x => So $ lb <= x && x <= ub) -> (y : Double) -> (0 _ : So $ y > 0) => Subset Double $ \x => So $ lb / y <= x && x <= ub / y
-  Element x _ / y = Element (x / y) $ believe_me Oh
-
 --- Error function and co ---
-
-%foreign "C:erf, libm 6"
-prim_erf : Double -> Double
 
 %foreign "C:erfc, libm 6"
 prim_erfc : Double -> Double
 
 export
-erf : Double -> Subset Double $ \y => So $ -1 <= y && y <= 1
-erf x = prim_erf x `Element` believe_me Oh
+erfc : Double -> DoubleBetween 0 2
+erfc x = BoundedDouble (prim_erfc x) @{believe_me Oh} @{believe_me Oh}
 
 export
-erfc : Double -> Subset Double $ \y => So $ 0 <= y && y <= 2
-erfc x = prim_erfc x `Element` believe_me Oh
+erf : Double -> DoubleBetween (-1) 1
+erf x = 1 - erfc x
 
 -- Code below is based on taken from
 -- https://hackage.haskell.org/package/erf-2.0.0.0/docs/src/Data-Number-Erf.html
@@ -36,12 +26,11 @@ erfc x = prim_erfc x `Element` believe_me Oh
 
 export
 normcdf : Double -> Probability
-normcdf x =
-  let Element x p = erfc (-x / sqrt 2) / 2
-  in P x @{p} -- @{believe_me Oh {- goes from subset bounds -}}
+normcdf x = P $ erfc (-x / sqrt 2) / 2
 
-inorm : Probability -> Double
-inorm p =
+-- calculation with precision only up to 10^9
+invnormcdf' : Probability -> Double
+invnormcdf' p =
     if      p == 0       then -1/0
     else if p == 1       then 1/0
     else if p < pLow     then closeToLowBound p.asDouble
@@ -98,17 +87,16 @@ invnormcdf : Probability -> Double
 invnormcdf p =
   if      p == 0 then -1/0
   else if p == 1 then 1/0
-  else let
-    -- Do one iteration with Halley's root finder to get a more accurate result.
-        x = inorm p
-        e = (normcdf x).asDouble - p.asDouble
-        u = e * sqrt (2*pi) * exp (x*x / 2)
+  else let -- Do one iteration with Halley's root finder to get a more accurate result.
+    x = invnormcdf' p
+    e = (normcdf x).asDouble - p.asDouble
+    u = e * sqrt (2*pi) * exp (x*x / 2)
     in x - u / (1 + x * u / 2)
 
---export
---inverfc : Double -> Double
---inverfc p = - invnormcdf (p/2) / sqrt 2
---
---export
---inverf : Double -> Double
---inverf p = inverfc (1 - p)
+export
+inverfc : DoubleBetween 0 2 -> Double
+inverfc p = - invnormcdf (P $ p/2) / sqrt 2
+
+export
+inverf : DoubleBetween (-1) 1 -> Double
+inverf p = inverfc (1 - p)
