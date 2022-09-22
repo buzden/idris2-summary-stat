@@ -9,3 +9,5 @@ brief = "Facilities for summary statistics"
 -- modules =
 
 sourcedir = "src"
+
+depends = contrib
