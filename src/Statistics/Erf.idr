@@ -30,15 +30,15 @@ invnormcdf' : Probability -> Double
 invnormcdf' p =
     if      p == 0       then -1/0
     else if p == 1       then 1/0
-    else if p < pLow     then closeToLowBound p.asDouble
-    else if p.inv < pLow then - closeToLowBound p.inv.asDouble
-    else                      middling p.asDouble
+    else if p < pLow     then closeToLowBound p
+    else if p.inv < pLow then - closeToLowBound p.inv
+    else                      middling p
 
   where
     pLow : Probability
     pLow = 0.02425
 
-    closeToLowBound : (p : Double) -> Double
+    closeToLowBound : Probability -> Double
     closeToLowBound p = let
       c1 = -7.784894002430293e-03
       c2 = -3.223964580411365e-01
@@ -52,13 +52,13 @@ invnormcdf' p =
       d3 =  2.445134137142996e+00
       d4 =  3.754408661907416e+00
 
-      q = sqrt(-2*log(p))
+      q = sqrt(-2*log(p.asDouble))
 
       in (((((c1*q+c2)*q+c3)*q+c4)*q+c5)*q+c6) /
          ((((d1*q+d2)*q+d3)*q+d4)*q+1)
 
     %inline
-    middling : (p : Double) -> Double
+    middling : Probability -> Double
     middling p = let
       a1 = -3.969683028665376e+01
       a2 =  2.209460984245205e+02
@@ -73,7 +73,7 @@ invnormcdf' p =
       b4 =  6.680131188771972e+01
       b5 = -1.328068155288572e+01
 
-      q = p - 0.5
+      q = p.asDouble - 0.5
       r = q*q
 
       in (((((a1*r+a2)*r+a3)*r+a4)*r+a5)*r+a6)*q /
