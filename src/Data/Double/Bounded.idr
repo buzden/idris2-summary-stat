@@ -81,6 +81,12 @@ public export
 Ord (DoubleBetween l u) where
   compare = compare `on` (.asDouble)
 
+--- Printing ---
+
+public export
+Show (DoubleBetween l u) where
+  show $ BoundedDouble x = show x
+
 --- Auxiliary functions ---
 
 public export %inline

@@ -91,3 +91,9 @@ Eq Probability where
 public export %inline
 Ord Probability where
   compare (P x) (P y) = compare x y
+
+--- Printing ---
+
+export
+Show Probability where
+  show $ P x = show x
