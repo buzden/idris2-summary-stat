@@ -1,0 +1,16 @@
+summary-stat, a summary statistics library for Idris2
+Copyright (c) 2022 Denis Buzdalov
+
+Licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Main part of `Erf` module's code is derived from the Haskell's `erf` package,
+licensed with BSD-3-Clause, Copyright (c) Lennart Augustsson.
+https://hackage.haskell.org/package/erf-2.0.0.0/docs/src/Data-Number-Erf.html
+
+Wilson bounds computation code is derived from the Idris2 port of the Hedgehog library,
+licensed with BSD-2-Clause, Copyright (c) 2021, Stefan Höck.
+The same code inspired the idea of usage bounded doubles throughout the code.
+https://github.com/stefan-hoeck/idris2-hedgehog/blob/main/src/Hedgehog/Internal/Property.idr
