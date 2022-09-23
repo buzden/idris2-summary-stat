@@ -6,7 +6,13 @@ authors = "Denis Buzdalov"
 
 brief = "Facilities for summary statistics"
 
--- modules =
+modules
+  = Data.Double.Bounded
+  , Data.Functor.StatefulMap
+
+  , Statistics.Confidence
+  , Statistics.Erf
+  , Statistics.Probability
 
 sourcedir = "src"
 
