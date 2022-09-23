@@ -1,0 +1,9 @@
+package summary-stat-tests
+
+authors = "Denis Buzdalov"
+version = 0.1.0
+
+main = Runner
+executable = runtests
+
+depends = test
