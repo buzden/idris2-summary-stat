@@ -2,6 +2,8 @@ module Statistics.Probability
 
 import public Data.Double.Bounded
 
+import Data.Nat
+
 %default total
 
 --- Data definition ---
@@ -51,6 +53,10 @@ namespace FromDoubles
   export
   (/) : (num, den : Double) -> (0 _ : So $ 1 < num && num <= den) => Probability
   num / den = fromDouble (num / den) @{believe_me Oh}
+
+export
+ratio : (num, den : Nat) -> (0 _ : num `LTE` den) => (0 _ : IsSucc den) => Probability
+ratio num den = (cast num / cast den) @{believe_me Oh}
 
 public export
 (.percent) : DoubleBetween 0 100 -> Probability
