@@ -1,6 +1,6 @@
 module Literals
 
-import Data.Statistics.Probability
+import Statistics.Probability
 
 one_fifth : Probability
 one_fifth = 1/5

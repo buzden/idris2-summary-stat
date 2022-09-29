@@ -1,0 +1,5 @@
+package a-summary-stat-test
+
+depends = summary-stat
+
+modules = Literals
