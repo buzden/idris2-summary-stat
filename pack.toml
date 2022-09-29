@@ -1,0 +1,9 @@
+[custom.all.summary-stat]
+type = "local"
+path = "."
+ipkg = "summary-stat.ipkg"
+
+[custom.all.summary-stat-tests]
+type = "local"
+path = "tests"
+ipkg = "tests.ipkg"
