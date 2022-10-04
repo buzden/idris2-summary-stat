@@ -8,7 +8,7 @@ brief = "Facilities for summary statistics"
 
 modules
   = Data.Double.Bounded
-  , Data.Functor.StatefulMap
+  , Data.Functor.TraverseSt
 
   , Statistics.Confidence
   , Statistics.Erf

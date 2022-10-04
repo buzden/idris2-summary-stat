@@ -1,6 +1,6 @@
 module Statistics.Confidence
 
-import public Data.Functor.StatefulMap
+import public Data.Functor.TraverseSt
 
 import Data.DPair
 import public Data.Nat
@@ -63,7 +63,7 @@ Eq CoverageTestResult where
 -- TODO to add tolerance parameter for required probabilities?
 export
 checkCoverageConditions :
-  MappableWithState t =>
+  TraversableSt t =>
   {default (1/1000000000) confidence : Probability} ->
   {n : _} ->
   Vect n (CoverageTest a) ->

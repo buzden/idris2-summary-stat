@@ -1,4 +1,4 @@
-module Data.Functor.StatefulMap
+module Data.Functor.TraverseSt
 
 import Control.Monad.State
 
@@ -12,29 +12,29 @@ import Data.List.Lazy
 -- thus there is no way to demand the final state.
 -- This allows us to implement this interface for (potentially) infinite data types.
 public export
-interface MappableWithState f where
+interface TraversableSt f where
   mapSt : (a -> s -> (s, b)) -> s -> f a -> f b
 
 public export
-MappableWithState Stream where
+TraversableSt Stream where
   mapSt f s (x::xs) = do
     let (s', y) = f x s
     y :: mapSt f s' xs
 
 public export
-MappableWithState Colist where
+TraversableSt Colist where
   mapSt _ _ []      = []
   mapSt f s (x::xs) = do
     let (s', y) = f x s
     y :: mapSt f s' xs
 
 public export
-MappableWithState LazyList where
+TraversableSt LazyList where
   mapSt _ _ []      = []
   mapSt f s (x::xs) = do
     let (s', y) = f x s
     y :: mapSt f s' xs
 
 public export
-Traversable f => MappableWithState f where
+Traversable f => TraversableSt f where
   mapSt f s = evalState s . traverse (ST . pure .: f)
