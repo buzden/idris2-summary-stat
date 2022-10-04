@@ -1,3 +1,5 @@
 ━━━ believe_me ━━━
   ✓ ratio passed 100 tests.
-  ✓ 1 succeeded.
+  ✓ doubles (/) passed 100 tests.
+  ✓ fromInteger passed 100 tests.
+  ✓ 3 succeeded.
