@@ -3,7 +3,12 @@ package summary-stat-tests
 authors = "Denis Buzdalov"
 version = 0.1.0
 
+modules = BaseDir
+
 main = Runner
 executable = runtests
+
+prebuild  = "sh buildhook pre"
+postbuild = "sh buildhook post"
 
 depends = test

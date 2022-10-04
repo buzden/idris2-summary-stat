@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ "$1" != "pre" -a "$1" != "post" ]; then exit 1; fi
+
+output="BaseDir.idr"
+
+echo "module BaseDir" > $output
+echo >> $output
+echo "export" >> $output
+echo "baseTestsDir : String" >> $output
+
+if [ "$1" = "pre" ]; then
+  echo "baseTestsDir = \"$(pwd)\"" >> $output
+fi

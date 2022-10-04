@@ -1,3 +1,6 @@
+[install]
+safety-prompt = false
+
 [custom.all.summary-stat]
 type = "local"
 path = "."
