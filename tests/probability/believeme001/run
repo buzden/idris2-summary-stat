@@ -1,9 +1,5 @@
 rm -rf build/
 
-# TODO to replace with `pack run --slient test.ipkg` (or so) as soon as silent mode is added
-
-pack install-deps test.ipkg >/dev/null || (echo "Couldn't install dependencies"; false) && \
-$1 --build test.ipkg && \
-./build/exec/test
+pack -q run test.ipkg
 
 rm -rf build/
