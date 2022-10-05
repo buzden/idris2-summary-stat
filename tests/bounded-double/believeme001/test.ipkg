@@ -1,0 +1,8 @@
+package a-summary-stat-test
+
+depends = summary-stat
+        , hedgehog
+
+main = BelieveMeSpec
+
+executable = test
