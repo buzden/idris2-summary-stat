@@ -1,5 +1,5 @@
 rm -rf build/
 
-pack -q run test.ipkg
+pack -q run test.ipkg -n 10000
 
 rm -rf build/
