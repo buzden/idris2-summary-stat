@@ -6,6 +6,12 @@ import Hedgehog
 
 import Test.Common
 
+numericDouble_gen_corr : Property
+numericDouble_gen_corr = property $ do
+  x <- forAll numericDouble
+  annotateShow x
+  assert $ x == x && x /= (1/0) && x /= (-1/0)
+
 someBoundedDouble_gen_corr : Property
 someBoundedDouble_gen_corr = property $ do
   (_ ** _ ** x) <- forAll someBoundedDouble
@@ -19,7 +25,8 @@ nzBoundedDouble_gen_corr = property $ do
 main : IO ()
 main = test
   [ "common generators" `MkGroup`
-      [ ("someBoundedDouble", someBoundedDouble_gen_corr)
+      [ ("numericDouble", numericDouble_gen_corr)
+      , ("someBoundedDouble", someBoundedDouble_gen_corr)
       , ("nzBoundedDouble", nzBoundedDouble_gen_corr)
       ]
   ]

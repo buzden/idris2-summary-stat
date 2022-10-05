@@ -1,4 +1,5 @@
 ━━━ common generators ━━━
+  ✓ numericDouble passed 100 tests.
   ✓ someBoundedDouble passed 100 tests.
   ✓ nzBoundedDouble passed 100 tests.
-  ✓ 2 succeeded.
+  ✓ 3 succeeded.
