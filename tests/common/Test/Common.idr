@@ -45,7 +45,10 @@ boundedDoubleCorrect x = do
 
 export
 numericDouble : Gen Double
-numericDouble = double $ exponentialDoubleFrom 0 MinDouble MaxDouble
+numericDouble = map purify $ double $ exponentialDoubleFrom 0 MinDouble MaxDouble
+  where
+    purify : Double -> Double
+    purify x = if x == 1.0/0 || x == (-1.0)/0 || not (x == x) then 0 else x
 
 export
 someBoundedDouble : Gen (l ** u ** DoubleBetween l u)
