@@ -97,6 +97,12 @@ public export %inline
 max4 : Double -> Double -> Double -> Double -> Double
 max4 a b c d = a `max` (b `max` (c `max` d))
 
+public export %inline
+OR : Type -> Type -> Type
+OR = Either
+
+infixr 0 `OR`
+
 --- Basic arithmetics ---
 
 export
@@ -112,5 +118,8 @@ export
 BoundedDouble x * BoundedDouble y = BoundedDouble (x * y) @{believe_me Oh} @{believe_me Oh}
 
 export
-(/) : DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (min4 (l/l') (l/u') (u/l') (u/u')) (max4 (l/l') (l/u') (u/l') (u/u'))
+(/) : (num : DoubleBetween l u) ->
+      (den : DoubleBetween l' u') ->
+      (0 _ : So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)) =>
+      DoubleBetween (min4 (l/l') (l/u') (u/l') (u/u')) (max4 (l/l') (l/u') (u/l') (u/u'))
 BoundedDouble x / BoundedDouble y = BoundedDouble (x / y) @{believe_me Oh} @{believe_me Oh}
