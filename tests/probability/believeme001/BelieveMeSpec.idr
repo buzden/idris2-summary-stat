@@ -7,10 +7,7 @@ import Hedgehog
 
 import Statistics.Probability
 
-probabilityCorrect : Probability -> PropertyT ()
-probabilityCorrect p = do
-  annotateShow p
-  assert $ 0 <= p.asDouble && p.asDouble <= 1
+import Test.Common
 
 moderateNat : Gen Nat
 moderateNat = choice $
@@ -27,9 +24,6 @@ ratio_correct_prop = property $ do
                                                                        Z   => (S Z ** (lteSuccRight lte, ItIsSucc))
                                                                        S k => (S k ** (lte             , ItIsSucc))
   probabilityCorrect $ ratio num den @{lte} @{succ}
-
-MaxDouble : Double
-MaxDouble = 1.79769e+308
 
 double_div_correct_prop : Property
 double_div_correct_prop = property $ do

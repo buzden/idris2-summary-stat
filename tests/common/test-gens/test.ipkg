@@ -1,9 +1,8 @@
 package a-summary-stat-test
 
-depends = summary-stat
-        , hedgehog
+depends = hedgehog
         , common-definitions-for-tests
 
-main = BelieveMeSpec
+main = Spec
 
 executable = test

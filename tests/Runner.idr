@@ -29,7 +29,8 @@ main : IO ()
 main = do
   ignore $ changeDir baseTestsDir
   runnerWith testOptions $
-    [ !("Bounded Double" `atDir` "bounded-double")
+    [ !("Common facilities" `atDir` "common")
+    , !("Bounded Double" `atDir` "bounded-double")
     , !("Error function" `atDir` "error-function")
     , !("Probability type" `atDir` "probability")
     , !("Confidence interval" `atDir` "confidence-interval")
