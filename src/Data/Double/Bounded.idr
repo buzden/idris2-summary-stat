@@ -118,8 +118,13 @@ export
 BoundedDouble x * BoundedDouble y = BoundedDouble (x * y) @{believe_me Oh} @{believe_me Oh}
 
 export
-(/) : (num : DoubleBetween l u) ->
+(/) : {l, u, l', u' : _} ->
+      (num : DoubleBetween l u) ->
       (den : DoubleBetween l' u') ->
       (0 _ : So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)) =>
       DoubleBetween (min4 (l/l') (l/u') (u/l') (u/u')) (max4 (l/l') (l/u') (u/l') (u/u'))
-BoundedDouble x / BoundedDouble y = BoundedDouble (x / y) @{believe_me Oh} @{believe_me Oh}
+BoundedDouble x / BoundedDouble y = fit (x / y) where
+  fit : {ll, uu : Double} -> (x : Double) -> DoubleBetween ll uu
+  fit x = do
+    let x = if x < ll then ll else if uu < x then uu else x
+    BoundedDouble x @{believe_me Oh} @{believe_me Oh}
