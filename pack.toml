@@ -1,5 +1,5 @@
 [install]
-safety-prompt = false
+whitelist = [ "summary-stat-tests" ]
 
 [custom.all.summary-stat]
 type = "local"
