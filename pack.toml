@@ -10,8 +10,3 @@ ipkg = "summary-stat.ipkg"
 type = "local"
 path = "tests"
 ipkg = "tests.ipkg"
-
-[custom.all.common-definitions-for-tests]
-type = "local"
-path = "tests/common"
-ipkg = "common.ipkg"
