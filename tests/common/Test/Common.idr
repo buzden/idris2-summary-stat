@@ -53,20 +53,37 @@ boundedDoubleCorrect x = do
   assert $ l <= x.asDouble && x.asDouble <= u
 
 export
-numericDouble : Gen Double
-numericDouble = map purify $ double $ exponentialDoubleFrom 0 MinDouble MaxDouble
+numericDouble : (canNegInf, canPosInf : Bool) -> Gen Double
+numericDouble canNegInf canPosInf = map purify $ double $ exponentialDoubleFrom 0 MinDouble MaxDouble
   where
     purify : Double -> Double
-    purify x = if x == 1.0/0 || x == (-1.0)/0 || not (x == x) then 0 else x
+    purify x = if not canPosInf && x == PosInf
+               || not canNegInf && x == NegInf
+               || not (x == x)
+               then 0 else x
 
 export
 someBoundedDouble : Gen (l ** u ** DoubleBetween l u)
 someBoundedDouble = do
-  l <- numericDouble
-  u <- numericDouble
+  l <- numericDouble True True
+  u <- numericDouble True True
   let (l, u) = (min l u, max l u)
-  x <- double $ exponentialDouble l u
+  let inBounds : Double -> Bool
+      inBounds x = l <= x && x <= u
+  let ifInBounds : Double -> Maybe Double
+      ifInBounds x = if inBounds x then Just x else Nothing
+  let basic : Gen Double
+      basic = element $ reorder $ l :: u :: fromList (mapMaybe ifInBounds [0, ClosestToZero, MinDouble, MaxDouble, NegInf, PosInf])
+  x <- choice
+         [ basic
+         , double (exponentialDouble (l `max` MinDouble) (u `min` MaxDouble)) >>= \x =>
+             if inBounds x then pure x else basic
+         ]
   pure (l ** u ** BoundedDouble x @{believe_me Oh} @{believe_me Oh})
+  where
+    reorder : forall k, a. Vect (S k) a -> Vect (S k) a
+    reorder $ a::b::c::rest = c::a::b::rest
+    reorder xs              = xs
 
 -- Bounded double with non-zero bounds and non-zero value
 export

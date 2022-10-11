@@ -8,15 +8,16 @@ import Test.Common
 
 numericDouble_gen_corr : Property
 numericDouble_gen_corr = property $ do
-  x <- forAll numericDouble
-  annotateShow x
-  assert $ x == x && x /= (1/0) && x /= (-1/0)
+  (canNegInf, canPosInf) <- forAll [| (bool, bool) |]
+  x <- forAll $ numericDouble canNegInf canPosInf
+  assert $ x == x
+  assert $ not canNegInf `implies` x /= NegInf
+  assert $ not canPosInf `implies` x /= PosInf
 
 anySolidDouble_gen_corr : Property
 anySolidDouble_gen_corr = property $ do
   x <- forAll anySolidDouble
   boundedDoubleCorrect x
-
 
 someBoundedDouble_gen_corr : Property
 someBoundedDouble_gen_corr = property $ do
