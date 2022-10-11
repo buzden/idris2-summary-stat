@@ -14,6 +14,12 @@ namespace DoubleProperties
   lteTrans : {0 a, b, c : Double} -> (0 _ : So $ a <= b) => (0 _ : So $ b <= c) => So $ a <= c
   lteTrans = believe_me Oh
 
+||| The type of double in the given bounds.
+|||
+||| Both bounds and the value can be infinite.
+||| If either bounds is `NaN`, the type is uninhabited.
+||| The internal double value cannot be `NaN` since to inhabit the constructor,
+||| one needs to satisfy the bounds which is impossible with `NaN` value.
 public export
 data DoubleBetween : (lower, upper : Double) -> Type where
   BoundedDouble :
@@ -22,6 +28,12 @@ data DoubleBetween : (lower, upper : Double) -> Type where
     (0 _ : So $ lower <= x) =>
     (0 _ : So $ x <= upper) =>
     DoubleBetween lower upper
+
+||| Represents a bounded double which can hold any `Double` except the `NaN`.
+||| Actually, an alias for `DoubleBetween` with infinite bounds.
+public export %inline
+SolidDouble : Type
+SolidDouble = DoubleBetween (-1.0/0) (1.0/0)
 
 --- Conversions ---
 
@@ -117,6 +129,7 @@ export
 (*) : DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (min4 (l*l') (l*u') (u*l') (u*u')) (max4 (l*l') (l*u') (u*l') (u*u'))
 BoundedDouble x * BoundedDouble y = BoundedDouble (x * y) @{believe_me Oh} @{believe_me Oh}
 
+-- TODO this signature works badly when at least two of four bounds are infinite, NaN appears.
 export
 (/) : {l, u, l', u' : _} ->
       (num : DoubleBetween l u) ->
