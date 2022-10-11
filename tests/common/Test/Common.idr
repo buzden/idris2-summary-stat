@@ -71,12 +71,9 @@ someBoundedDouble = do
 -- Bounded double with non-zero bounds and non-zero value
 export
 nzBoundedDouble : Gen (l ** u ** DoubleBetween l u)
-nzBoundedDouble = do
-  l <- numericDouble
+nzBoundedDouble = someBoundedDouble <&> \(l ** u ** x) => do
   let l = if l == 0 then -ClosestToZero else l
-  u <- numericDouble
   let u = if u == 0 then ClosestToZero else u
-  let (l, u) = (min l u, max l u)
-  x <- double $ exponentialDouble l u
+  let x = x.asDouble
   let x = if x == 0 then ClosestToZero else x
-  pure (l ** u ** BoundedDouble x @{believe_me Oh} @{believe_me Oh})
+  (l ** u ** BoundedDouble x @{believe_me Oh} @{believe_me Oh})
