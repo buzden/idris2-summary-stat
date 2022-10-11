@@ -3,6 +3,7 @@ module Test.Common
 import Data.Buffer
 import Data.Bounded
 import Data.Double.Bounded
+import Data.Vect
 
 import Hedgehog
 
@@ -15,10 +16,12 @@ implies : Bool -> Bool -> Bool
 implies a c = not a || c
 
 public export
-MaxDouble, MinDouble, ClosestToZero : Double
+MaxDouble, MinDouble, ClosestToZero, PosInf, NegInf : Double
 MaxDouble = 1.79769e+308
 MinDouble = -MaxDouble
 ClosestToZero = 2.22507e-308
+PosInf = 1.0/0
+NegInf = -1.0/0
 
 export
 probabilityCorrect : Probability -> PropertyT ()
@@ -36,6 +39,12 @@ veryAnyDouble = unsafePerformIO . doubleFromBits64 <$> bits64 constantBounded
         | Nothing => pure $ 0.0/0
       setBits64 bf 0 n
       getDouble bf 0
+
+export
+anySolidDouble : Gen SolidDouble
+anySolidDouble = veryAnyDouble >>= \x => case (decSo $ NegInf <= x, decSo $ x <= PosInf) of
+  (Yes lp, Yes rp) => pure $ BoundedDouble x
+  _                => element [0, ClosestToZero, MinDouble, MaxDouble, NegInf, PosInf] <&> \x => BoundedDouble x @{believe_me Oh} @{believe_me Oh}
 
 export
 boundedDoubleCorrect : {l, u : _} -> DoubleBetween l u -> PropertyT ()

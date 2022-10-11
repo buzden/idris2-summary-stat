@@ -12,6 +12,12 @@ numericDouble_gen_corr = property $ do
   annotateShow x
   assert $ x == x && x /= (1/0) && x /= (-1/0)
 
+anySolidDouble_gen_corr : Property
+anySolidDouble_gen_corr = property $ do
+  x <- forAll anySolidDouble
+  boundedDoubleCorrect x
+
+
 someBoundedDouble_gen_corr : Property
 someBoundedDouble_gen_corr = property $ do
   (_ ** _ ** x) <- forAll someBoundedDouble
@@ -26,6 +32,7 @@ main : IO ()
 main = test
   [ "common generators" `MkGroup`
       [ ("numericDouble", numericDouble_gen_corr)
+      , ("anySolidDouble", anySolidDouble_gen_corr)
       , ("someBoundedDouble", someBoundedDouble_gen_corr)
       , ("nzBoundedDouble", nzBoundedDouble_gen_corr)
       ]
