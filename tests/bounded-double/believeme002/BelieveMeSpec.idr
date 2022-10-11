@@ -6,21 +6,81 @@ import Hedgehog
 
 import Test.Common
 
-binop_corr : {f, g : (l, u, l', u' : Double) -> Double} ->
-             (forL, forR : Gen (l ** u ** DoubleBetween l u)) ->
-             ({l, u, l', u' : _} -> DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (f l u l' u') (g l u l' u')) ->
-             Property
-binop_corr forL forR op = property $ do
-  (_ ** _ ** x) <- forAll forL
-  (_ ** _ ** y) <- forAll forR
-  boundedDoubleCorrect $ x `op` y
+sp : (l ** u ** DoubleBetween l u)
+sp = (_ ** _ ** 1)
+
+plus_corr : Property
+plus_corr = property $ do
+  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2)) <-
+    forAllDefault ((sp, sp) ** %search) $ [| (someBoundedDouble, someBoundedDouble) |] `plus` \x => do
+      let l = fst $ fst x
+      let u = fst $ snd $ fst x
+      let l' = fst $ snd x
+      let u' = fst $ snd $ snd x
+      ( Finite l `OR` Finite l' `OR` So (l == l')
+      , Finite u `OR` Finite u' `OR` So (u == u')
+        )
+  boundedDoubleCorrect $ (x + x') @{f1} @{f2}
+
+minus_corr : Property
+minus_corr = property $ do
+  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2)) <-
+    forAllDefault ((sp, sp) ** %search) $ [| (someBoundedDouble, someBoundedDouble) |] `plus` \x => do
+      let l = fst $ fst x
+      let u = fst $ snd $ fst x
+      let l' = fst $ snd x
+      let u' = fst $ snd $ snd x
+      ( Finite l `OR` Finite u' `OR` So (l /= u')
+      , Finite u `OR` Finite l' `OR` So (u /= l')
+        )
+  boundedDoubleCorrect $ (x - x') @{f1} @{f2}
+
+mul_corr : Property
+mul_corr = property $ do
+  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2, f3, f4, f5, f6, f7, f8)) <-
+    forAllDefault ((sp, sp) ** %search) $ [| (someBoundedDouble, someBoundedDouble) |] `plus` \x => do
+      let l = fst $ fst x
+      let u = fst $ snd $ fst x
+      let l' = fst $ snd x
+      let u' = fst $ snd $ snd x
+      ( Finite l `OR` NonZero l'
+      , Finite l `OR` NonZero u'
+      , Finite u `OR` NonZero l'
+      , Finite u `OR` NonZero u'
+      , Finite l' `OR` NonZero l
+      , Finite l' `OR` NonZero u
+      , Finite u' `OR` NonZero l
+      , Finite u' `OR` NonZero u
+        )
+  boundedDoubleCorrect $ (x * x') @{f1} @{f2} @{f3} @{f4} @{f5} @{f6} @{f7} @{f8}
+
+div_corr : Property
+div_corr = property $ do
+  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2, f3, f4, f5, f6, f7, f8, f9)) <-
+    forAllDefault ((sp, sp) ** %search) $ [| (someBoundedDouble, someBoundedDouble) |] `plus` \x => do
+      let l = fst $ fst x
+      let u = fst $ snd $ fst x
+      let l' = fst $ snd x
+      let u' = fst $ snd $ snd x
+      let den = snd $ snd $ snd x
+      ( So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)
+      , Finite l `OR` Finite l'
+      , Finite l `OR` Finite u'
+      , Finite u `OR` Finite l'
+      , Finite u `OR` Finite u'
+      , NonZero l `OR` NonZero l'
+      , NonZero l `OR` NonZero u'
+      , NonZero u `OR` NonZero l'
+      , NonZero u `OR` NonZero u'
+        )
+  boundedDoubleCorrect $ (x / x') @{f1} @{f2} @{f3} @{f4} @{f5} @{f6} @{f7} @{f8} @{f9}
 
 main : IO ()
 main = test
   [ "believe_me" `MkGroup`
-      [ ("(+)", binop_corr someBoundedDouble someBoundedDouble (+))
-      , ("(-)", binop_corr someBoundedDouble someBoundedDouble (-))
-      , ("(*)", binop_corr someBoundedDouble someBoundedDouble (*))
-      , ("(/)", binop_corr someBoundedDouble nzBoundedDouble $ \x, y => (x / y) @{believe_me Oh})
+      [ ("(+)", plus_corr)
+      , ("(-)", minus_corr)
+      , ("(*)", mul_corr)
+      , ("(/)", div_corr)
       ]
   ]

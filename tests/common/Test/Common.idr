@@ -85,12 +85,34 @@ someBoundedDouble = do
     reorder $ a::b::c::rest = c::a::b::rest
     reorder xs              = xs
 
--- Bounded double with non-zero bounds and non-zero value
 export
-nzBoundedDouble : Gen (l ** u ** DoubleBetween l u)
-nzBoundedDouble = someBoundedDouble <&> \(l ** u ** x) => do
-  let l = if l == 0 then -ClosestToZero else l
-  let u = if u == 0 then ClosestToZero else u
-  let x = x.asDouble
-  let x = if x == 0 then ClosestToZero else x
-  (l ** u ** BoundedDouble x @{believe_me Oh} @{believe_me Oh})
+Show (So x) where
+  show _ = "Oh"
+
+--- Retry "filtration" facilities ---
+
+public export
+interface BuildableFrom from (0 what : from -> Type) where
+  tryBuild : (f : from) -> Maybe $ what f
+
+export
+BuildableFrom f a => BuildableFrom f b => BuildableFrom f (\x => Either (a x) (b x)) where
+  tryBuild x = Left <$> tryBuild x <|> Right <$> tryBuild x
+
+export
+BuildableFrom f a => BuildableFrom f b => BuildableFrom f (\x => (a x, b x)) where
+  tryBuild x = [| (tryBuild x, tryBuild x) |]
+
+export
+{g : _} -> BuildableFrom f (So . g) where
+  tryBuild x = case decSo $ g x of
+                 Yes y => Just y
+                 No _  => Nothing
+
+export
+plus : Gen a -> (0 b : _) -> BuildableFrom a b => Gen $ Maybe (x : a ** b x)
+plus g _ = g <&> \x => tryBuild x <&> \y => (x ** y)
+
+export
+forAllDefault : Show a => Lazy a -> Gen (Maybe a) -> PropertyT a
+forAllDefault def g = fromMaybe def <$> forAll g
