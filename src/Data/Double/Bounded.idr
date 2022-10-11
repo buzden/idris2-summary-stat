@@ -115,26 +115,59 @@ OR = Either
 
 infixr 0 `OR`
 
+public export %inline
+Finite : Double -> Type
+Finite x = So (x /= 1/0 && x /= -1/0)
+
+public export %inline
+NonZero : Double -> Type
+NonZero x = So (x /= 0)
+
 --- Basic arithmetics ---
 
 export
-(+) : DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (l+l') (u+u')
+(+) : DoubleBetween l u ->
+      DoubleBetween l' u' ->
+      (0 _ : Finite l `OR` Finite l' `OR` So (l == l')) =>
+      (0 _ : Finite u `OR` Finite u' `OR` So (u == u')) =>
+      DoubleBetween (l+l') (u+u')
 BoundedDouble x + BoundedDouble y = BoundedDouble (x + y) @{believe_me Oh} @{believe_me Oh}
 
 export
-(-) : DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (l-u') (u-l')
+(-) : DoubleBetween l u ->
+      DoubleBetween l' u' ->
+      (0 _ : Finite l `OR` Finite u' `OR` So (l /= u')) =>
+      (0 _ : Finite u `OR` Finite l' `OR` So (u /= l')) =>
+      DoubleBetween (l-u') (u-l')
 BoundedDouble x - BoundedDouble y = BoundedDouble (x - y) @{believe_me Oh} @{believe_me Oh}
 
 export
-(*) : DoubleBetween l u -> DoubleBetween l' u' -> DoubleBetween (min4 (l*l') (l*u') (u*l') (u*u')) (max4 (l*l') (l*u') (u*l') (u*u'))
+(*) : DoubleBetween l u ->
+      DoubleBetween l' u' ->
+      (0 _ : Finite l `OR` NonZero l') =>
+      (0 _ : Finite l `OR` NonZero u') =>
+      (0 _ : Finite u `OR` NonZero l') =>
+      (0 _ : Finite u `OR` NonZero u') =>
+      (0 _ : Finite l' `OR` NonZero l) =>
+      (0 _ : Finite l' `OR` NonZero u) =>
+      (0 _ : Finite u' `OR` NonZero l) =>
+      (0 _ : Finite u' `OR` NonZero u) =>
+      DoubleBetween (min4 (l*l') (l*u') (u*l') (u*u')) (max4 (l*l') (l*u') (u*l') (u*u'))
 BoundedDouble x * BoundedDouble y = BoundedDouble (x * y) @{believe_me Oh} @{believe_me Oh}
 
--- TODO this signature works badly when at least two of four bounds are infinite, NaN appears.
 export
 (/) : {l, u, l', u' : _} ->
       (num : DoubleBetween l u) ->
       (den : DoubleBetween l' u') ->
       (0 _ : So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)) =>
+      (0 _ : Finite l `OR` Finite l') =>
+      (0 _ : Finite l `OR` Finite u') =>
+      (0 _ : Finite u `OR` Finite l') =>
+      (0 _ : Finite u `OR` Finite u') =>
+      (0 _ : NonZero l `OR` NonZero l') =>
+      (0 _ : NonZero l `OR` NonZero u') =>
+      (0 _ : NonZero u `OR` NonZero l') =>
+      (0 _ : NonZero u `OR` NonZero u') =>
       DoubleBetween (min4 (l/l') (l/u') (u/l') (u/u')) (max4 (l/l') (l/u') (u/l') (u/u'))
 BoundedDouble x / BoundedDouble y = fit (x / y) where
   fit : {ll, uu : Double} -> (x : Double) -> DoubleBetween ll uu
