@@ -2,6 +2,7 @@ module Runner
 
 import BaseDir
 
+import Data.Maybe
 import Data.String
 
 import Test.Golden
@@ -22,13 +23,21 @@ atDir poolName dir = do
     emptyPool : IO TestPool
     emptyPool = pure $ MkTestPool poolName [] Nothing []
 
-testOptions : Options
-testOptions = {timing := True, interactive := True} (initOptions "idris2" True)
+testOptions : IO Options
+testOptions = do
+  onlies <- fromMaybe [] . tail' <$> getArgs
+  pure $
+    { color := True
+    , timing := True
+    , interactive := True
+    , failureFile := Just "failures"
+    , onlyNames := onlies
+    } (initOptions "idris2" True)
 
 main : IO ()
 main = do
   ignore $ changeDir baseTestsDir
-  runnerWith testOptions $
+  runnerWith !testOptions $
     [ !("Common facilities" `atDir` "common")
     , !("Bounded Double" `atDir` "bounded-double")
     , !("Error function" `atDir` "error-function")
