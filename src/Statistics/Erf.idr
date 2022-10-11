@@ -1,6 +1,6 @@
 module Statistics.Erf
 
-import Statistics.Probability
+import public Statistics.Probability
 
 %default total
 
