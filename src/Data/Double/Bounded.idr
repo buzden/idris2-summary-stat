@@ -15,9 +15,11 @@ namespace DoubleProperties
   lteTrans = believe_me Oh
 
   public export %inline
-  MaxDouble, MinDouble : Double
+  MaxDouble, MinDouble, PosInf, NegInf : Double
   MaxDouble = 1.79769e+308
   MinDouble = -MaxDouble
+  PosInf = 1/0
+  NegInf = -1/0
 
 ||| The type of double in the given bounds.
 |||
@@ -38,7 +40,7 @@ data DoubleBetween : (lower, upper : Double) -> Type where
 ||| Actually, an alias for `DoubleBetween` with infinite bounds.
 public export %inline
 SolidDouble : Type
-SolidDouble = DoubleBetween (-1.0/0) (1.0/0)
+SolidDouble = DoubleBetween NegInf PosInf
 
 public export %inline
 FiniteDouble : Type
@@ -126,7 +128,7 @@ infixr 0 `OR`
 
 public export %inline
 Finite : Double -> Type
-Finite x = So (x /= 1/0 && x /= -1/0)
+Finite x = So (x /= NegInf && x /= PosInf)
 
 public export %inline
 NonZero : Double -> Type
@@ -195,7 +197,7 @@ sqrt : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween (sqrt l) (sqrt 
 sqrt x = BoundedDouble (sqrt x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
-sqrtRelaxed : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween 0 (1/0)
+sqrtRelaxed : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween 0 PosInf
 sqrtRelaxed x = BoundedDouble (sqrt x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
@@ -207,7 +209,7 @@ exp : DoubleBetween l u -> DoubleBetween (exp l) (exp u)
 exp x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
-expRelaxed : DoubleBetween l u -> DoubleBetween 0 (1/0)
+expRelaxed : DoubleBetween l u -> DoubleBetween 0 PosInf
 expRelaxed x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
