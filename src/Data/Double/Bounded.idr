@@ -14,6 +14,11 @@ namespace DoubleProperties
   lteTrans : {0 a, b, c : Double} -> (0 _ : So $ a <= b) => (0 _ : So $ b <= c) => So $ a <= c
   lteTrans = believe_me Oh
 
+  public export %inline
+  MaxDouble, MinDouble : Double
+  MaxDouble = 1.79769e+308
+  MinDouble = -MaxDouble
+
 ||| The type of double in the given bounds.
 |||
 ||| Both bounds and the value can be infinite.
@@ -34,6 +39,10 @@ data DoubleBetween : (lower, upper : Double) -> Type where
 public export %inline
 SolidDouble : Type
 SolidDouble = DoubleBetween (-1.0/0) (1.0/0)
+
+public export %inline
+FiniteDouble : Type
+FiniteDouble = DoubleBetween MinDouble MaxDouble
 
 --- Conversions ---
 
@@ -174,3 +183,33 @@ BoundedDouble x / BoundedDouble y = fit (x / y) where
   fit x = do
     let x = if x < ll then ll else if uu < x then uu else x
     BoundedDouble x @{believe_me Oh} @{believe_me Oh}
+
+--- Math functions ---
+
+export
+sqrt : DoubleBetween 0 (1/0) -> DoubleBetween 0 (1/0)
+sqrt x = BoundedDouble (sqrt x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+log : DoubleBetween 0 (1/0) -> SolidDouble
+log x = BoundedDouble (log x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+exp : SolidDouble -> DoubleBetween 0 (1/0)
+exp x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+sin : FiniteDouble -> DoubleBetween (-1) 1
+sin x = BoundedDouble (sin x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+cos : FiniteDouble -> DoubleBetween (-1) 1
+cos x = BoundedDouble (cos x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+asin : DoubleBetween (-1) 1 -> DoubleBetween (-Prelude.pi/2) (Prelude.pi/2)
+asin x = BoundedDouble (asin x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+acos : DoubleBetween (-1) 1 -> DoubleBetween 0 Prelude.pi
+acos x = BoundedDouble (acos x.asDouble) @{believe_me Oh} @{believe_me Oh}

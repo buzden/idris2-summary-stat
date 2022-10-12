@@ -16,9 +16,7 @@ implies : Bool -> Bool -> Bool
 implies a c = not a || c
 
 public export
-MaxDouble, MinDouble, ClosestToZero, PosInf, NegInf : Double
-MaxDouble = 1.79769e+308
-MinDouble = -MaxDouble
+ClosestToZero, PosInf, NegInf : Double
 ClosestToZero = 2.22507e-308
 PosInf = 1.0/0
 NegInf = -1.0/0
