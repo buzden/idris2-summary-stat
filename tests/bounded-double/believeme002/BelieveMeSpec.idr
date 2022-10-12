@@ -75,6 +75,11 @@ div_corr = property $ do
         )
   boundedDoubleCorrect $ (x / x') @{f1} @{f2} @{f3} @{f4} @{f5} @{f6} @{f7} @{f8} @{f9}
 
+negate_corr : Property
+negate_corr = property $ do
+  (_ ** _ ** x) <- forAll someBoundedDouble
+  boundedDoubleCorrect $ negate x
+
 main : IO ()
 main = test
   [ "believe_me" `MkGroup`
@@ -82,5 +87,6 @@ main = test
       , ("(-)", minus_corr)
       , ("(*)", mul_corr)
       , ("(/)", div_corr)
+      , ("negate", negate_corr)
       ]
   ]

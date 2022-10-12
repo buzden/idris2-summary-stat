@@ -184,6 +184,10 @@ BoundedDouble x / BoundedDouble y = fit (x / y) where
     let x = if x < ll then ll else if uu < x then uu else x
     BoundedDouble x @{believe_me Oh} @{believe_me Oh}
 
+export
+negate : DoubleBetween l u -> DoubleBetween (-u) (-l)
+negate x = BoundedDouble (negate x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
 --- Math functions ---
 
 export
