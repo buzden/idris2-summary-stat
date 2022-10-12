@@ -1,6 +1,9 @@
-━━━ common generators ━━━
+━━━ double generators ━━━
   ✓ numericDouble passed 10000 tests.
+  ✓ nonNegativeDouble passed 10000 tests.
+  ✓ 2 succeeded.
+━━━ bounded double generators ━━━
   ✓ anySolidDouble passed 10000 tests.
   ✓ anyBoundedDouble passed 10000 tests.
   ✓ someBoundedDouble passed 10000 tests.
-  ✓ 4 succeeded.
+  ✓ 3 succeeded.

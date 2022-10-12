@@ -61,6 +61,13 @@ numericDouble canNegInf canPosInf = map purify $ double $ exponentialDoubleFrom 
                then 0 else x
 
 export
+nonNegativeDouble : (canPosInf : Bool) -> Gen Double
+nonNegativeDouble canPosInf = md <$> numericDouble canPosInf canPosInf
+  where
+    md : Double -> Double
+    md x = if x < 0 then negate x else x
+
+export
 anyBoundedDouble : (l, u : Double) -> (0 _ : So $ l <= u) => Gen $ DoubleBetween l u
 anyBoundedDouble l u = do
   let inBounds : Double -> Bool

@@ -14,6 +14,14 @@ numericDouble_gen_corr = property $ do
   assert $ not canNegInf `implies` x /= NegInf
   assert $ not canPosInf `implies` x /= PosInf
 
+nonNegativeDouble_gen_corr : Property
+nonNegativeDouble_gen_corr = property $ do
+  canPosInf <- forAll bool
+  x <- forAll $ nonNegativeDouble canPosInf
+  assert $ x == x
+  assert $ x >= 0
+  assert $ not canPosInf `implies` x /= PosInf
+
 anySolidDouble_gen_corr : Property
 anySolidDouble_gen_corr = property $ do
   x <- forAll anySolidDouble
@@ -33,9 +41,12 @@ someBoundedDouble_gen_corr = property $ do
 
 main : IO ()
 main = test
-  [ "common generators" `MkGroup`
+  [ "double generators" `MkGroup`
       [ ("numericDouble", numericDouble_gen_corr)
-      , ("anySolidDouble", anySolidDouble_gen_corr)
+      , ("nonNegativeDouble", nonNegativeDouble_gen_corr)
+      ]
+  , "bounded double generators" `MkGroup`
+      [ ("anySolidDouble", anySolidDouble_gen_corr)
       , ("anyBoundedDouble", anyBoundedDouble_gen_corr)
       , ("someBoundedDouble", someBoundedDouble_gen_corr)
       ]
