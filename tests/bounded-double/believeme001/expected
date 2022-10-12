@@ -1,4 +1,8 @@
 ━━━ believe_me lte ━━━
   ✓ lteRefl passed 10000 tests.
+  ✓ lteNotNaNL passed 10000 tests.
+  ✓ lteNotNaNR passed 10000 tests.
   ✓ lteTrans passed 10000 tests.
-  ✓ 2 succeeded.
+  ✓ lteNegInf passed 10000 tests.
+  ✓ ltePosInf passed 10000 tests.
+  ✓ 6 succeeded.

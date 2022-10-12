@@ -2,6 +2,7 @@ module BelieveMeSpec
 
 import Data.Buffer
 import Data.Bounded
+import Data.Double.Bounded
 
 import Hedgehog
 
@@ -10,8 +11,19 @@ import Test.Common
 lteRefl_prop : Property
 lteRefl_prop = property $ do
   x <- forAll veryAnyDouble
-  annotateShow x
   assert $ x == x `implies` x <= x
+
+lteNotNaNL_prop : Property
+lteNotNaNL_prop = property $ do
+  x <- forAll veryAnyDouble
+  y <- forAll veryAnyDouble
+  assert $ x <= y `implies` x == x
+
+lteNotNaNR_prop : Property
+lteNotNaNR_prop = property $ do
+  x <- forAll veryAnyDouble
+  y <- forAll veryAnyDouble
+  assert $ y <= x `implies` x == x
 
 lteTrans_prop : Property
 lteTrans_prop = property $ do
@@ -21,10 +33,24 @@ lteTrans_prop = property $ do
   assert $ (x <= y && y <= z) `implies` x <= z
   -- very ineffective check...
 
+lteNegInf_prop : Property
+lteNegInf_prop = property $ do
+  x <- forAll veryAnyDouble
+  assert $ x == x `implies` NegInf <= x
+
+ltePosInf_prop : Property
+ltePosInf_prop = property $ do
+  x <- forAll veryAnyDouble
+  assert $ x == x `implies` x <= PosInf
+
 main : IO ()
 main = test
   [ "believe_me lte" `MkGroup`
       [ ("lteRefl", lteRefl_prop)
+      , ("lteNotNaNL", lteNotNaNL_prop )
+      , ("lteNotNaNR", lteNotNaNR_prop )
       , ("lteTrans", lteTrans_prop)
+      , ("lteNegInf", lteNegInf_prop)
+      , ("ltePosInf", ltePosInf_prop)
       ]
   ]

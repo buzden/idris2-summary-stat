@@ -11,6 +11,14 @@ namespace DoubleProperties
   lteRefl = believe_me Oh
 
   export
+  lteNotNaNL : {0 x, y : Double} -> (0 _ : So $ x <= y) => So $ x == x
+  lteNotNaNL = believe_me Oh
+
+  export
+  lteNotNaNR : {0 x, y : Double} -> (0 _ : So $ y <= x) => So $ x == x
+  lteNotNaNR = believe_me Oh
+
+  export
   lteTrans : {0 a, b, c : Double} -> (0 _ : So $ a <= b) => (0 _ : So $ b <= c) => So $ a <= c
   lteTrans = believe_me Oh
 
@@ -20,6 +28,14 @@ namespace DoubleProperties
   MinDouble = -MaxDouble
   PosInf = 1/0
   NegInf = -1/0
+
+  export
+  lteNegInf : {0 x : Double} -> (0 _ : So $ x == x) => So $ NegInf <= x
+  lteNegInf = believe_me Oh
+
+  export
+  ltePosInf : {0 x : Double} -> (0 _ : So $ x == x) => So $ x <= PosInf
+  ltePosInf = believe_me Oh
 
 ||| The type of double in the given bounds.
 |||
