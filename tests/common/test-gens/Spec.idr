@@ -19,6 +19,13 @@ anySolidDouble_gen_corr = property $ do
   x <- forAll anySolidDouble
   boundedDoubleCorrect x
 
+anyBoundedDouble_gen_corr : Property
+anyBoundedDouble_gen_corr = property $ do
+  l <- forAll $ numericDouble True True
+  u <- forAll $ numericDouble True True
+  x <- forAll $ anyBoundedDouble (l `min` u) (l `max` u) @{believe_me Oh}
+  boundedDoubleCorrect x
+
 someBoundedDouble_gen_corr : Property
 someBoundedDouble_gen_corr = property $ do
   (_ ** _ ** x) <- forAll someBoundedDouble
@@ -29,6 +36,7 @@ main = test
   [ "common generators" `MkGroup`
       [ ("numericDouble", numericDouble_gen_corr)
       , ("anySolidDouble", anySolidDouble_gen_corr)
+      , ("anyBoundedDouble", anyBoundedDouble_gen_corr)
       , ("someBoundedDouble", someBoundedDouble_gen_corr)
       ]
   ]

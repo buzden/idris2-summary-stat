@@ -63,11 +63,8 @@ numericDouble canNegInf canPosInf = map purify $ double $ exponentialDoubleFrom 
                then 0 else x
 
 export
-someBoundedDouble : Gen (l ** u ** DoubleBetween l u)
-someBoundedDouble = do
-  l <- numericDouble True True
-  u <- numericDouble True True
-  let (l, u) = (min l u, max l u)
+anyBoundedDouble : (l, u : Double) -> (0 _ : So $ l <= u) => Gen $ DoubleBetween l u
+anyBoundedDouble l u = do
   let inBounds : Double -> Bool
       inBounds x = l <= x && x <= u
   let ifInBounds : Double -> Maybe Double
@@ -79,11 +76,20 @@ someBoundedDouble = do
          , double (exponentialDouble (l `max` MinDouble) (u `min` MaxDouble)) >>= \x =>
              if inBounds x then pure x else basic
          ]
-  pure (l ** u ** BoundedDouble x @{believe_me Oh} @{believe_me Oh})
+  pure $ BoundedDouble x @{believe_me Oh} @{believe_me Oh}
   where
     reorder : forall k, a. Vect (S k) a -> Vect (S k) a
     reorder $ a::b::c::rest = c::a::b::rest
     reorder xs              = xs
+
+export
+someBoundedDouble : Gen (l ** u ** DoubleBetween l u)
+someBoundedDouble = do
+  l <- numericDouble True True
+  u <- numericDouble True True
+  let (l, u) = (min l u, max l u)
+  x <- anyBoundedDouble l u @{believe_me Oh}
+  pure (l ** u ** x)
 
 export
 Show (So x) where
