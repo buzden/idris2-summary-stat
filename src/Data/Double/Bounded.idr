@@ -84,6 +84,10 @@ public export
 weakenBounds : DoubleBetween l u -> (0 _ : So $ l' <= l) => (0 _ : So $ u <= u') => DoubleBetween l' u'
 weakenBounds $ BoundedDouble x = BoundedDouble x @{lteTrans {b=l}} @{lteTrans {b=u}}
 
+public export %inline
+relaxToSolid : DoubleBetween l u -> SolidDouble
+relaxToSolid x@(BoundedDouble _ @{lb} @{rb}) = weakenBounds x @{lteNegInf @{lteNotNaNL @{lb}}} @{ltePosInf @{lteNotNaNR @{rb}}}
+
 public export
 strengthenBounds : {l', u' : _} -> DoubleBetween l u -> Maybe $ DoubleBetween l' u'
 strengthenBounds = maybeBoundedDouble . cast
