@@ -191,16 +191,24 @@ negate x = BoundedDouble (negate x.asDouble) @{believe_me Oh} @{believe_me Oh}
 --- Math functions ---
 
 export
-sqrt : DoubleBetween 0 (1/0) -> DoubleBetween 0 (1/0)
+sqrt : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween (sqrt l) (sqrt u)
 sqrt x = BoundedDouble (sqrt x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
-log : DoubleBetween 0 (1/0) -> SolidDouble
+sqrtRelaxed : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween 0 (1/0)
+sqrtRelaxed x = BoundedDouble (sqrt x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+log : (0 _ : So $ 0 <= l) => DoubleBetween l u -> DoubleBetween (log l) (log u)
 log x = BoundedDouble (log x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
-exp : SolidDouble -> DoubleBetween 0 (1/0)
+exp : DoubleBetween l u -> DoubleBetween (exp l) (exp u)
 exp x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
+expRelaxed : DoubleBetween l u -> DoubleBetween 0 (1/0)
+expRelaxed x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
 sin : FiniteDouble -> DoubleBetween (-1) 1
