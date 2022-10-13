@@ -130,6 +130,26 @@ public export
 Show (DoubleBetween l u) where
   show $ BoundedDouble x = show x
 
+--- Important constants ---
+
+public export %inline
+NegInf : (0 _ : So $ u == u) => DoubleBetween NegInf u
+NegInf = BoundedDouble NegInf @{%search} @{lteNegInf}
+
+public export %inline
+PosInf : (0 _ : So $ l == l) => DoubleBetween l PosInf
+PosInf = BoundedDouble PosInf @{ltePosInf}
+
+public export %inline
+pi, Pi : DoubleBetween Prelude.pi Prelude.pi
+pi = MinimalBounds.fromDouble pi
+Pi = pi
+
+public export %inline
+euler, Euler : DoubleBetween Prelude.euler Prelude.euler
+euler = MinimalBounds.fromDouble euler
+Euler = euler
+
 --- Auxiliary functions ---
 
 public export %inline
