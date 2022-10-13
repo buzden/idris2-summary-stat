@@ -4,6 +4,44 @@ import public Data.So
 
 %default total
 
+namespace DoubleUtils
+
+  public export %inline
+  MaxDouble, MinDouble, PosInf, NegInf : Double
+  MaxDouble = 1.79769e+308
+  MinDouble = -MaxDouble
+  PosInf = 1/0
+  NegInf = -1/0
+
+  public export %inline
+  min4 : Double -> Double -> Double -> Double -> Double
+  min4 a b c d = a `min` (b `min` (c `min` d))
+
+  public export %inline
+  min6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
+  min6 a b c d e f = a `min` (b `min` min4 c d e f)
+
+  public export %inline
+  max4 : Double -> Double -> Double -> Double -> Double
+  max4 a b c d = a `max` (b `max` (c `max` d))
+
+  public export %inline
+  max6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
+  max6 a b c d e f = a `max` (b `max` max4 c d e f)
+
+  -- Returns zero if `l <= 0 <= u`, or `l` or `u` otherwise
+  public export
+  zormin : (l, u : Double) -> Double
+  zormin l u = max l (0 `min` u)
+
+  public export %inline
+  Finite : Double -> Type
+  Finite x = So (x /= NegInf && x /= PosInf)
+
+  public export %inline
+  NonZero : Double -> Type
+  NonZero x = So (x /= 0)
+
 namespace DoubleProperties
 
   export
@@ -21,13 +59,6 @@ namespace DoubleProperties
   export
   lteTrans : {0 a, b, c : Double} -> (0 _ : So $ a <= b) => (0 _ : So $ b <= c) => So $ a <= c
   lteTrans = believe_me Oh
-
-  public export %inline
-  MaxDouble, MinDouble, PosInf, NegInf : Double
-  MaxDouble = 1.79769e+308
-  MinDouble = -MaxDouble
-  PosInf = 1/0
-  NegInf = -1/0
 
   export
   lteNegInf : {0 x : Double} -> (0 _ : So $ x == x) => So $ NegInf <= x
@@ -153,39 +184,10 @@ Euler = euler
 --- Auxiliary functions ---
 
 public export %inline
-min4 : Double -> Double -> Double -> Double -> Double
-min4 a b c d = a `min` (b `min` (c `min` d))
-
-public export %inline
-min6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
-min6 a b c d e f = a `min` (b `min` min4 c d e f)
-
-public export %inline
-max4 : Double -> Double -> Double -> Double -> Double
-max4 a b c d = a `max` (b `max` (c `max` d))
-
-public export %inline
-max6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
-max6 a b c d e f = a `max` (b `max` max4 c d e f)
-
--- Returns zero if `l <= 0 <= u`, or `l` or `u` otherwise
-public export
-zormin : (l, u : Double) -> Double
-zormin l u = max l (0 `min` u)
-
-public export %inline
 OR : Type -> Type -> Type
 OR = Either
 
 infixr 0 `OR`
-
-public export %inline
-Finite : Double -> Type
-Finite x = So (x /= NegInf && x /= PosInf)
-
-public export %inline
-NonZero : Double -> Type
-NonZero x = So (x /= 0)
 
 --- Basic arithmetics ---
 
