@@ -52,6 +52,16 @@ zormin_prop = property $ do
   assert $ z == 0 || z == l || z == u
   assert $ l <= 0 && 0 <= u `implies` z == 0
 
+lteMin_prop : Property
+lteMin_prop = property $ do
+  x <- forAll veryAnyDouble
+  assert $ x /= NegInf && x /= PosInf && x == x `implies` MinDouble <= x
+
+lteMax_prop : Property
+lteMax_prop = property $ do
+  x <- forAll veryAnyDouble
+  assert $ x /= NegInf && x /= PosInf && x == x `implies` x <= MaxDouble
+
 main : IO ()
 main = test
   [ "believe_me lte" `MkGroup`
@@ -61,6 +71,8 @@ main = test
       , ("lteTrans", lteTrans_prop)
       , ("lteNegInf", lteNegInf_prop)
       , ("ltePosInf", ltePosInf_prop)
+      , ("lteMin", lteMin_prop)
+      , ("lteMax", lteMax_prop)
       ]
   , "aux doubles funs" `MkGroup`
       [ ("zormin", zormin_prop)

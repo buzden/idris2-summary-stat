@@ -68,6 +68,14 @@ namespace DoubleProperties
   ltePosInf : {0 x : Double} -> (0 _ : So $ x == x) => So $ x <= PosInf
   ltePosInf = believe_me Oh
 
+  export
+  lteMin : {0 x : Double} -> (0 _ : So $ x == x) => (0 _ : Finite x) => So $ MinDouble <= x
+  lteMin = believe_me Oh
+
+  export
+  lteMax : {0 x : Double} -> (0 _ : So $ x == x) => (0 _ : Finite x) => So $ x <= MaxDouble
+  lteMax = believe_me Oh
+
 ||| The type of double in the given bounds.
 |||
 ||| Both bounds and the value can be infinite.
@@ -118,6 +126,10 @@ weakenBounds $ BoundedDouble x = BoundedDouble x @{lteTrans {b=l}} @{lteTrans {b
 public export %inline
 relaxToSolid : DoubleBetween l u -> SolidDouble
 relaxToSolid x@(BoundedDouble _ @{lb} @{rb}) = weakenBounds x @{lteNegInf @{lteNotNaNL @{lb}}} @{ltePosInf @{lteNotNaNR @{rb}}}
+
+public export %inline
+relaxToFinite : (0 _ : Finite l) => (0 _ : Finite u) => DoubleBetween l u -> FiniteDouble
+relaxToFinite x@(BoundedDouble _ @{lb} @{rb}) = weakenBounds x @{lteMin @{lteNotNaNL @{lb}}} @{lteMax @{lteNotNaNR @{rb}}}
 
 public export
 strengthenBounds : {l', u' : _} -> DoubleBetween l u -> Maybe $ DoubleBetween l' u'
