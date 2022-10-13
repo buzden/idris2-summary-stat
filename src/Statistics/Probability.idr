@@ -41,8 +41,8 @@ public export %inline
 (.asDouble) = cast
 
 public export %inline
-(.asBoundedDouble) : Probability -> DoubleBetween 0 1
-(.asBoundedDouble) = cast
+(.value) : Probability -> DoubleBetween 0 1
+(.value) = cast
 
 public export
 maybeP : Double -> Maybe Probability
