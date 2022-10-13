@@ -43,6 +43,15 @@ ltePosInf_prop = property $ do
   x <- forAll veryAnyDouble
   assert $ x == x `implies` x <= PosInf
 
+zormin_prop : Property
+zormin_prop = property $ do
+  l <- forAll $ numericDouble True True
+  u <- forAll $ numericDouble True True
+  let z = zormin l u
+  annotateShow z
+  assert $ z == 0 || z == l || z == u
+  assert $ l <= 0 && 0 <= u `implies` z == 0
+
 main : IO ()
 main = test
   [ "believe_me lte" `MkGroup`
@@ -52,5 +61,8 @@ main = test
       , ("lteTrans", lteTrans_prop)
       , ("lteNegInf", lteNegInf_prop)
       , ("ltePosInf", ltePosInf_prop)
+      ]
+  , "aux doubles funs" `MkGroup`
+      [ ("zormin", zormin_prop)
       ]
   ]

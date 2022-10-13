@@ -56,14 +56,16 @@ mul_corr = property $ do
 
 div_corr : Property
 div_corr = property $ do
-  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2, f3, f4, f5, f6, f7, f8, f9)) <-
+  (((l ** u ** x), (l' ** u' ** x')) ** (f1, f2, f3, f4, f5, f6, f7, f8, f9, f10)) <-
     forAllDefault ((sp, sp) ** %search) $ [| (someBoundedDouble, someBoundedDouble) |] `plus` \x => do
       let l = fst $ fst x
       let u = fst $ snd $ fst x
       let l' = fst $ snd x
       let u' = fst $ snd $ snd x
+      let num = snd $ snd $ fst x
       let den = snd $ snd $ snd x
-      ( So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)
+      ( So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && l /= 0 && u /= 0)
+      , So (0 < l) `OR` So (u < 0) `OR` So (0 < l') `OR` So (u' < 0) `OR` (NonZero num.asDouble, NonZero den.asDouble)
       , Finite l `OR` Finite l'
       , Finite l `OR` Finite u'
       , Finite u `OR` Finite l'
@@ -73,7 +75,7 @@ div_corr = property $ do
       , NonZero u `OR` NonZero l'
       , NonZero u `OR` NonZero u'
         )
-  boundedDoubleCorrect $ (x / x') @{f1} @{f2} @{f3} @{f4} @{f5} @{f6} @{f7} @{f8} @{f9}
+  boundedDoubleCorrect $ (x / x') @{f1} @{f2} @{f3} @{f4} @{f5} @{f6} @{f7} @{f8} @{f9} @{f10}
 
 negate_corr : Property
 negate_corr = property $ do

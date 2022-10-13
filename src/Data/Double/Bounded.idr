@@ -137,8 +137,21 @@ min4 : Double -> Double -> Double -> Double -> Double
 min4 a b c d = a `min` (b `min` (c `min` d))
 
 public export %inline
+min6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
+min6 a b c d e f = a `min` (b `min` min4 c d e f)
+
+public export %inline
 max4 : Double -> Double -> Double -> Double -> Double
 max4 a b c d = a `max` (b `max` (c `max` d))
+
+public export %inline
+max6 : Double -> Double -> Double -> Double -> Double -> Double -> Double
+max6 a b c d e f = a `max` (b `max` max4 c d e f)
+
+-- Returns zero if `l <= 0 <= u`, or `l` or `u` otherwise
+public export
+zormin : (l, u : Double) -> Double
+zormin l u = max l (0 `min` u)
 
 public export %inline
 OR : Type -> Type -> Type
@@ -190,7 +203,8 @@ export
 (/) : {l, u, l', u' : _} ->
       (num : DoubleBetween l u) ->
       (den : DoubleBetween l' u') ->
-      (0 _ : So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && den.asDouble /= 0)) =>
+      (0 _ : So (0 < l') `OR` So (u' < 0) `OR` So (l' < 0 && 0 < u' && l /= 0 && u /= 0)) =>
+      (0 _ : So (0 < l) `OR` So (u < 0) `OR` So (0 < l') `OR` So (u' < 0) `OR` (NonZero num.asDouble, NonZero den.asDouble)) =>
       (0 _ : Finite l `OR` Finite l') =>
       (0 _ : Finite l `OR` Finite u') =>
       (0 _ : Finite u `OR` Finite l') =>
@@ -199,7 +213,9 @@ export
       (0 _ : NonZero l `OR` NonZero u') =>
       (0 _ : NonZero u `OR` NonZero l') =>
       (0 _ : NonZero u `OR` NonZero u') =>
-      DoubleBetween (min4 (l/l') (l/u') (u/l') (u/u')) (max4 (l/l') (l/u') (u/l') (u/u'))
+      DoubleBetween
+        (min6 (l/l') (l/u') (u/l') (u/u') (l/zormin l' u') (u/zormin l' u'))
+        (max6 (l/l') (l/u') (u/l') (u/u') (l/zormin l' u') (u/zormin l' u'))
 BoundedDouble x / BoundedDouble y = fit (x / y) where
   fit : {ll, uu : Double} -> (x : Double) -> DoubleBetween ll uu
   fit x = do
