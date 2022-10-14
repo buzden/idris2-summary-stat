@@ -180,10 +180,15 @@ namespace KnownBounds
 public export
 Eq (DoubleBetween l u) where
   (==) = (==) `on` (.asDouble)
+  (/=) = (/=) `on` (.asDouble)
 
 public export
 Ord (DoubleBetween l u) where
   compare = compare `on` (.asDouble)
+  (<)  = (<)  `on` (.asDouble)
+  (<=) = (<=) `on` (.asDouble)
+  (>)  = (>)  `on` (.asDouble)
+  (>=) = (>=) `on` (.asDouble)
 
 --- Printing ---
 
