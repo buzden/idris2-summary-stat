@@ -1,5 +1,7 @@
 module Data.Double.Bounded
 
+import Data.DPair
+
 import public Data.So
 
 %default total
@@ -219,6 +221,10 @@ Euler = euler
 --- Analysis operations ---
 
 export
+strengthenRight : (x, y : DoubleBetween l u) -> (0 _ : So $ x <= y) => Subset (DoubleBetween x.asDouble u) $ \y' => y'.asDouble = y.asDouble
+strengthenRight (BoundedDouble x) (BoundedDouble y) @{xy} = Element (BoundedDouble y) Refl
+
+export
 bisect : (m : DoubleBetween l u) -> DoubleBetween l u -> DoubleBetween l m.asDouble `OR` DoubleBetween m.asDouble u
 bisect (BoundedDouble m @{lm}) (BoundedDouble x @{lb}) with (x <= m) proof xm
   _ | True  = Left $ BoundedDouble x @{%search} @{eqToSo xm}
@@ -228,6 +234,18 @@ bisect (BoundedDouble m @{lm}) (BoundedDouble x @{lb}) with (x <= m) proof xm
                 let mm = lteNotNaNR @{lm}
                 lteFromLt @{lteRev}
               }
+
+export
+trisect : (m1, m2 : DoubleBetween l u) ->
+          (0 _ : So $ m1 <= m2) =>
+          DoubleBetween l u ->
+          DoubleBetween l m1.asDouble `OR` DoubleBetween m1.asDouble m2.asDouble `OR` DoubleBetween m2.asDouble u
+trisect m1 m2 x = case bisect m1 x of
+                    Left l  => Left l
+                    Right r => Right $ do
+                      let Element m2' prf = strengthenRight m1 m2
+                      rewrite sym prf
+                      bisect m2' r
 
 --- Basic arithmetics ---
 
