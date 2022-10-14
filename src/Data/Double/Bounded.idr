@@ -4,6 +4,14 @@ import public Data.So
 
 %default total
 
+--- Auxiliary functions ---
+
+public export %inline
+OR : Type -> Type -> Type
+OR = Either
+
+infixr 0 `OR`
+
 namespace DoubleUtils
 
   public export %inline
@@ -75,6 +83,8 @@ namespace DoubleProperties
   export
   lteMax : {0 x : Double} -> (0 _ : So $ x == x) => (0 _ : Finite x) => So $ x <= MaxDouble
   lteMax = believe_me Oh
+
+--- Type definitions ---
 
 ||| The type of double in the given bounds.
 |||
@@ -192,14 +202,6 @@ public export %inline
 euler, Euler : DoubleBetween Prelude.euler Prelude.euler
 euler = MinimalBounds.fromDouble euler
 Euler = euler
-
---- Auxiliary functions ---
-
-public export %inline
-OR : Type -> Type -> Type
-OR = Either
-
-infixr 0 `OR`
 
 --- Basic arithmetics ---
 
