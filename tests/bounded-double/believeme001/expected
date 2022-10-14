@@ -7,7 +7,9 @@
   ✓ ltePosInf passed 10000 tests.
   ✓ lteMin passed 10000 tests.
   ✓ lteMax passed 10000 tests.
-  ✓ 8 succeeded.
+  ✓ lteFromLt passed 10000 tests.
+  ✓ lteRev passed 10000 tests.
+  ✓ 10 succeeded.
 ━━━ aux doubles funs ━━━
   ✓ zormin passed 10000 tests.
   ✓ 1 succeeded.

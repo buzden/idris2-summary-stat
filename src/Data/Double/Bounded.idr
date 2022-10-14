@@ -84,6 +84,14 @@ namespace DoubleProperties
   lteMax : {0 x : Double} -> (0 _ : So $ x == x) => (0 _ : Finite x) => So $ x <= MaxDouble
   lteMax = believe_me Oh
 
+  export
+  lteFromLt : {0 x, y : Double} -> (0 _ : So $ x < y) => So $ x <= y
+  lteFromLt = believe_me Oh
+
+  export
+  lteRev : {0 x, y : Double} -> (0 _ : So $ x == x) => (0 _ : So $ y == y) => (0 _ : So $ not $ x <= y) => So $ y < x
+  lteRev = believe_me Oh
+
 --- Type definitions ---
 
 ||| The type of double in the given bounds.
@@ -202,6 +210,19 @@ public export %inline
 euler, Euler : DoubleBetween Prelude.euler Prelude.euler
 euler = MinimalBounds.fromDouble euler
 Euler = euler
+
+--- Analysis operations ---
+
+export
+bisect : (m : DoubleBetween l u) -> DoubleBetween l u -> DoubleBetween l m.asDouble `OR` DoubleBetween m.asDouble u
+bisect (BoundedDouble m @{lm}) (BoundedDouble x @{lb}) with (x <= m) proof xm
+  _ | True  = Left $ BoundedDouble x @{%search} @{eqToSo xm}
+  _ | False = Right $ BoundedDouble x @{do
+                let smx = eqToSo $ cong not xm
+                let xx = lteNotNaNR @{lb}
+                let mm = lteNotNaNR @{lm}
+                lteFromLt @{lteRev}
+              }
 
 --- Basic arithmetics ---
 

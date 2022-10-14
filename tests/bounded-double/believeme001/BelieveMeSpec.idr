@@ -62,6 +62,18 @@ lteMax_prop = property $ do
   x <- forAll veryAnyDouble
   assert $ x /= NegInf && x /= PosInf && x == x `implies` x <= MaxDouble
 
+lteFromLt_prop : Property
+lteFromLt_prop = property $ do
+  x <- forAll veryAnyDouble
+  y <- forAll veryAnyDouble
+  assert $ x < y `implies` x <= y
+
+lteRev_prop : Property
+lteRev_prop = property $ do
+  x <- forAll veryAnyDouble
+  y <- forAll veryAnyDouble
+  assert $ x == x && y == y && not (x <= y) `implies` y < x
+
 main : IO ()
 main = test
   [ "believe_me lte" `MkGroup`
@@ -73,6 +85,8 @@ main = test
       , ("ltePosInf", ltePosInf_prop)
       , ("lteMin", lteMin_prop)
       , ("lteMax", lteMax_prop)
+      , ("lteFromLt", lteFromLt_prop)
+      , ("lteRev", lteRev_prop)
       ]
   , "aux doubles funs" `MkGroup`
       [ ("zormin", zormin_prop)
