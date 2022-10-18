@@ -67,7 +67,6 @@ export
 checkCoverageConditions :
   TraversableSt t =>
   {default (1/1000000000) confidence : Probability} ->
-  {n : _} ->
   Vect n (CoverageTest a) ->
   t a ->
   t $ Vect n CoverageTestResult
@@ -78,7 +77,7 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
     R : (attempts : Nat) -> (successes : Vect n $ Subset Nat (`LTE` attempts)) -> PastResults
 
   initialResults : PastResults
-  initialResults = R 0 $ replicate _ $ 0 `Element` LTEZero
+  initialResults = R 0 $ coverageTests <&> const (0 `Element` LTEZero)
 
   checkCoverageOnce : a -> PastResults -> (PastResults, Vect n CoverageTestResult)
   checkCoverageOnce x $ R prevAttempts prevResults = do
