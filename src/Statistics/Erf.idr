@@ -10,11 +10,11 @@ import public Statistics.Probability
 prim_erfc : Double -> Double
 
 export
-erfc : Double -> DoubleBetween 0 2
-erfc x = BoundedDouble (prim_erfc x) @{believe_me Oh} @{believe_me Oh}
+erfc : SolidDouble -> DoubleBetween 0 2
+erfc x = BoundedDouble (prim_erfc x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
-erf : Double -> DoubleBetween (-1) 1
+erf : SolidDouble -> DoubleBetween (-1) 1
 erf x = 1 - erfc x
 
 -- Code below is based on taken from
@@ -22,17 +22,18 @@ erf x = 1 - erfc x
 -- Licensed with BSD-3-Clause, copyright Lennart Augustsson
 
 export
-normcdf : Double -> Probability
+normcdf : SolidDouble -> Probability
 normcdf x = P $ erfc (-x / sqrt 2) / 2
 
 -- calculation with precision only up to 10^9
-invnormcdf' : Probability -> Double
+invnormcdf' : Probability -> SolidDouble
 invnormcdf' p =
-    if      p == 0       then -1/0
-    else if p == 1       then 1/0
-    else if p < pLow     then closeToLowBound p
-    else if p.inv < pLow then - closeToLowBound p.inv
-    else                      middling p
+    let res = if      p == 0       then NegInf
+              else if p == 1       then PosInf
+              else if p < pLow     then closeToLowBound p
+              else if p.inv < pLow then - closeToLowBound p.inv
+              else                      middling p
+    in BoundedDouble res @{believe_me Oh} @{believe_me Oh}
 
   where
     pLow : Probability
@@ -80,20 +81,22 @@ invnormcdf' p =
          (((((b1*r+b2)*r+b3)*r+b4)*r+b5)*r+1)
 
 export
-invnormcdf : Probability -> Double
+invnormcdf : Probability -> SolidDouble
 invnormcdf p =
-  if      p == 0 then -1/0
-  else if p == 1 then 1/0
+  if      p == 0 then NegInf
+  else if p == 1 then PosInf
   else let -- Do one iteration with Halley's root finder to get a more accurate result.
     x = invnormcdf' p
     e = (normcdf x).asDouble - p.asDouble
+    x = x.asDouble
     u = e * sqrt (2*pi) * exp (x*x / 2)
-    in x - u / (1 + x * u / 2)
+    x' = x - u / (1 + x * u / 2)
+    in BoundedDouble x' @{believe_me Oh} @{believe_me Oh}
 
 export
-inverfc : DoubleBetween 0 2 -> Double
+inverfc : DoubleBetween 0 2 -> SolidDouble
 inverfc p = - invnormcdf (P $ p/2) / sqrt 2
 
 export
-inverf : DoubleBetween (-1) 1 -> Double
+inverf : DoubleBetween (-1) 1 -> SolidDouble
 inverf p = inverfc (1 - p)

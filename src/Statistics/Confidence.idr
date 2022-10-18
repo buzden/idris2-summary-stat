@@ -24,7 +24,7 @@ wilsonBounds confidence count successes =
   let
     n = cast count
     p = successes.asDouble
-    z = invnormcdf $ inv $ confidence / 2
+    z = cast $ invnormcdf $ inv $ confidence / 2
     zz_n = z * z / n
 
     midpoint = p + zz_n / 2

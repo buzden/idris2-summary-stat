@@ -1,3 +1,4 @@
 ━━━ believe_me ━━━
   ✓ erfc bounds passed 10000 tests.
-  ✓ 1 succeeded.
+  ✓ invnormcdf passed 10000 tests.
+  ✓ 2 succeeded.

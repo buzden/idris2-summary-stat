@@ -95,6 +95,10 @@ someBoundedDouble = do
   pure (l ** u ** x)
 
 export
+anyProbability : Gen Probability
+anyProbability = P <$> anyBoundedDouble _ _
+
+export
 Show (So x) where
   show _ = "Oh"
 
