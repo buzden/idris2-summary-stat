@@ -23,15 +23,18 @@ atDir poolName dir = do
     emptyPool : IO TestPool
     emptyPool = pure $ MkTestPool poolName [] Nothing []
 
+fitsPattern : (pattern, test : String) -> Bool
+fitsPattern = isInfixOf
+
 testOptions : IO Options
 testOptions = do
-  onlies <- fromMaybe [] . tail' <$> getArgs
+  onlies <- tail' <$> getArgs
   pure $
     { color := True
     , timing := True
     , interactive := True
     , failureFile := Just "failures"
-    , onlyNames := onlies
+    , onlyNames := onlies <&> \patterns, test => any (`fitsPattern` test) patterns
     } (initOptions "idris2" True)
 
 main : IO ()
