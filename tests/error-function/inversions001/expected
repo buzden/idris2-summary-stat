@@ -1,0 +1,10 @@
+━━━ inversions ━━━
+  ✓ erf passed 10000 tests.
+  ✓ erfc passed 10000 tests.
+  ✓ normcdf passed 10000 tests.
+  ✓ 3 succeeded.
+━━━ anti-inversions ━━━
+  ✓ erf passed 10000 tests.
+  ✓ erfc passed 10000 tests.
+  ✓ normcdf passed 10000 tests.
+  ✓ 3 succeeded.

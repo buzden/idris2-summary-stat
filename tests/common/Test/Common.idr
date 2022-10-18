@@ -19,6 +19,30 @@ public export
 ClosestToZero : Double
 ClosestToZero = 2.22507e-308
 
+public export
+data Eps = MkEps Double
+
+EPS : Eps => Double
+EPS @{MkEps x} = x
+
+namespace Double
+
+  export
+  eqUpToEps : Eps => Double -> Double -> Bool
+  eqUpToEps x y = abs (x - y) <= EPS
+
+namespace BoundedDouble
+
+  export
+  eqUpToEps : Eps => DoubleBetween l u -> DoubleBetween l u -> Bool
+  eqUpToEps = eqUpToEps `on` (.asDouble)
+
+namespace Probability
+
+  export
+  eqUpToEps : Eps => Probability -> Probability -> Bool
+  eqUpToEps = eqUpToEps `on` (.asDouble)
+
 export
 probabilityCorrect : Probability -> PropertyT ()
 probabilityCorrect p = do
