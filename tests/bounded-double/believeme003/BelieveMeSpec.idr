@@ -19,11 +19,6 @@ pol_nneg_corr fn = property $ do
   x <- forAll $ anyBoundedDouble l u @{believe_me Oh}
   boundedDoubleCorrect $ fn x @{believe_me Oh}
 
-un_corr : {l, u, l', u' : _} -> (0 _ : So $ l <= u) => (DoubleBetween l u -> DoubleBetween l' u') -> Property
-un_corr f = property $ do
-  inp <- forAll $ anyBoundedDouble l u
-  boundedDoubleCorrect $ f inp
-
 main : IO ()
 main = test
   [ "believe_me poly bounds" `MkGroup`

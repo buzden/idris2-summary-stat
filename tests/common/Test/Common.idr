@@ -44,12 +44,6 @@ namespace Probability
   eqUpToEps = eqUpToEps `on` (.asDouble)
 
 export
-probabilityCorrect : Probability -> PropertyT ()
-probabilityCorrect p = do
-  annotateShow p
-  assert $ 0 <= p.asDouble && p.asDouble <= 1
-
-export
 veryAnyDouble : Gen Double
 veryAnyDouble = unsafePerformIO . doubleFromBits64 <$> bits64 constantBounded
   where
@@ -71,6 +65,10 @@ boundedDoubleCorrect : {l, u : _} -> DoubleBetween l u -> PropertyT ()
 boundedDoubleCorrect x = do
   annotate "\{show l} <= \{show x} <= \{show u}"
   assert $ l <= x.asDouble && x.asDouble <= u
+
+export
+probabilityCorrect : Probability -> PropertyT ()
+probabilityCorrect p = boundedDoubleCorrect p.value
 
 export
 numericDouble : (canNegInf, canPosInf : Bool) -> Gen Double
@@ -125,6 +123,26 @@ anyProbability = P <$> anyBoundedDouble _ _
 export
 Show (So x) where
   show _ = "Oh"
+
+--- Special common properties ---
+
+export
+un_corr : {l, u, l', u' : _} -> (0 _ : So $ l <= u) => (DoubleBetween l u -> DoubleBetween l' u') -> Property
+un_corr f = property $ do
+  x <- forAll $ anyBoundedDouble _ _
+  boundedDoubleCorrect $ f x
+
+namespace ToProbability
+
+  export
+  un_corr : {l, u : _} -> (0 _ : So $ l <= u) => (DoubleBetween l u -> Probability) -> Property
+  un_corr f = un_corr $ (.value) . f
+
+namespace FromProbability
+
+  export
+  un_corr : {l', u' : _} -> (Probability -> DoubleBetween l' u') -> Property
+  un_corr f = un_corr $ f . P
 
 --- Retry "filtration" facilities ---
 
