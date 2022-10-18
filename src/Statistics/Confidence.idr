@@ -36,7 +36,9 @@ wilsonBounds confidence count successes =
     low  = (midpoint - offset) / denominator
     high = (midpoint + offset) / denominator
 
-  in mapHom (\x => fromDouble x @{believe_me Oh}) (low, high)
+  in if low == low && high == high
+       then mapHom (\x => fromDouble x @{believe_me Oh}) (low, high)
+       else (0, 1) -- we've gone too close to infinite `z`
 
 --- Performing some actions while having statistical significance of coverage test ---
 
