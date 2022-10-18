@@ -12,4 +12,10 @@ main = test
       [ ("erfc bounds", un_corr erfc)
       , ("invnormcdf", un_corr invnormcdf)
       ]
+  , "other bounds" `MkGroup`
+      [ ("erf", un_corr erf)
+      , ("normcdf", un_corr normcdf)
+      , ("inverfc", un_corr inverfc)
+      , ("inverf", un_corr inverf)
+      ]
   ]

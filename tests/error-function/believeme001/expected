@@ -2,3 +2,9 @@
   ✓ erfc bounds passed 10000 tests.
   ✓ invnormcdf passed 10000 tests.
   ✓ 2 succeeded.
+━━━ other bounds ━━━
+  ✓ erf passed 10000 tests.
+  ✓ normcdf passed 10000 tests.
+  ✓ inverfc passed 10000 tests.
+  ✓ inverf passed 10000 tests.
+  ✓ 4 succeeded.
