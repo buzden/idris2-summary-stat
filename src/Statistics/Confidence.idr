@@ -45,9 +45,9 @@ wilsonBounds confidence count successes =
 public export
 record CoverageTest a where
   constructor Cover
-  successCondition : a -> Bool
   minimalProbability, maximalProbability : Probability
   {auto 0 minMaxCorrect : So $ minimalProbability <= maximalProbability}
+  successCondition : a -> Bool
 
 -- `Just` means "statistical significance", `Nothing` means "no significance yet".
 -- `Bool` inside `Just` means whether result is in bounds with statistical significance.
@@ -76,7 +76,7 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
   checkCoverageOnce x $ R prevAttempts prevResults = do
     let %inline currAttempts : Nat; currAttempts = S prevAttempts
     mapFst (R currAttempts) $ unzip $ coverageTests `zip` prevResults <&>
-      \(Cover cond minP maxP, Element prevSucc _) => do
+      \(Cover minP maxP cond, Element prevSucc _) => do
         let pr@(Element currSucc _) = if cond x
                                        then S prevSucc `Element` LTESucc %search
                                        else prevSucc   `Element` lteSuccRight %search
