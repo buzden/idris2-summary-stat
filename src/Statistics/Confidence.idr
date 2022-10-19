@@ -49,18 +49,11 @@ record CoverageTest a where
   minimalProbability, maximalProbability : Probability
   {auto 0 minMaxCorrect : So $ minimalProbability <= maximalProbability}
 
-public export
-data CoverageTestResult
-  = SignificantlyTrue
-  | SignificantlyFalse
-  | NoSignificance
-
-public export
-Eq CoverageTestResult where
-  SignificantlyTrue  == SignificantlyTrue  = True
-  SignificantlyFalse == SignificantlyFalse = True
-  NoSignificance     == NoSignificance     = True
-  _ == _ = False
+-- `Just` means "statistical significance", `Nothing` means "no significance yet".
+-- `Bool` inside `Just` means whether result is in bounds with statistical significance.
+public export %inline
+CoverageTestResult : Type
+CoverageTestResult = Maybe Bool
 
 -- TODO to add tolerance parameter for required probabilities?
 export
@@ -88,7 +81,7 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
                                        then S prevSucc `Element` LTESucc %search
                                        else prevSucc   `Element` lteSuccRight %search
         let (wLow, wHigh) = wilsonBounds confidence currAttempts $ ratio currSucc currAttempts
-        let confRes = if      wLow >= minP && wHigh <= maxP then SignificantlyTrue
-                      else if wLow > maxP  || wHigh < minP  then SignificantlyFalse
-                      else                                       NoSignificance
+        let confRes = if      wLow >= minP && wHigh <= maxP then Just True
+                      else if wLow > maxP  || wHigh < minP  then Just False
+                      else                                       Nothing
         (pr, confRes)
