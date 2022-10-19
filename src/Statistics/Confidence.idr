@@ -49,13 +49,44 @@ record CoverageTest a where
   {auto 0 minMaxCorrect : So $ minimalProbability <= maximalProbability}
   successCondition : a -> Bool
 
+namespace CoverageTest
+
+  public export %inline
+  DefaultTolerance : Probability
+  DefaultTolerance = 95.percent
+
+  export
+  coverBetween : {default DefaultTolerance tolerance : Probability} ->
+                 (minP, maxP : Probability) ->
+                 (successCondition : a -> Bool) ->
+                 CoverageTest a
+  coverBetween minP maxP = do
+    let (minP, maxP) = (min minP maxP, max minP maxP)
+    let minP = minP * tolerance
+    let maxP = inv $ maxP.inv * tolerance
+    let maxP = if maxP <= minP then minP else maxP -- just in case `maxP` is a non-normalised very small value
+    Cover minP maxP @{believe_me Oh}
+
+  export
+  coverMin : {default DefaultTolerance tolerance : Probability} ->
+             (minP : Probability) ->
+             (successCondition : a -> Bool) ->
+             CoverageTest a
+  coverMin minP = coverBetween {tolerance} minP 1
+
+  export
+  coverWith : {default DefaultTolerance tolerance : Probability} ->
+              (singleP : Probability) ->
+              (successCondition : a -> Bool) ->
+              CoverageTest a
+  coverWith singleP = coverBetween {tolerance} singleP singleP
+
 -- `Just` means "statistical significance", `Nothing` means "no significance yet".
 -- `Bool` inside `Just` means whether result is in bounds with statistical significance.
 public export %inline
 CoverageTestResult : Type
 CoverageTestResult = Maybe Bool
 
--- TODO to add tolerance parameter for required probabilities?
 export
 checkCoverageConditions :
   TraversableSt t =>
