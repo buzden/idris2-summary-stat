@@ -81,11 +81,27 @@ namespace CoverageTest
               CoverageTest a
   coverWith singleP = coverBetween {tolerance} singleP singleP
 
+public export
+data SignificantBounds
+  = BoundsOk
+  | UpperBoundViolated Probability
+  | LowerBoundViolated Probability
+
+public export
+isOk : SignificantBounds -> Bool
+isOk BoundsOk = True
+isOk _        = False
+
+export
+Interpolation SignificantBounds where
+  interpolate BoundsOk               = "ok"
+  interpolate $ UpperBoundViolated x = "(..., ...) --> \{show x}"
+  interpolate $ LowerBoundViolated x = "\{show x} <-- (..., ...)"
+
 -- `Just` means "statistical significance", `Nothing` means "no significance yet".
--- `Bool` inside `Just` means whether result is in bounds with statistical significance.
 public export %inline
 CoverageTestResult : Type
-CoverageTestResult = Maybe Bool
+CoverageTestResult = Maybe SignificantBounds
 
 export
 checkCoverageConditions :
@@ -112,7 +128,8 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
                                        then S prevSucc `Element` LTESucc %search
                                        else prevSucc   `Element` lteSuccRight %search
         let (wLow, wHigh) = wilsonBounds confidence currAttempts $ ratio currSucc currAttempts
-        let confRes = if      wLow >= minP && wHigh <= maxP then Just True
-                      else if wLow > maxP  || wHigh < minP  then Just False
+        let confRes = if      wLow >= minP && wHigh <= maxP then Just BoundsOk
+                      else if wLow > maxP                   then Just $ UpperBoundViolated wLow
+                      else if                 wHigh < minP  then Just $ LowerBoundViolated wHigh
                       else                                       Nothing
         (pr, confRes)
