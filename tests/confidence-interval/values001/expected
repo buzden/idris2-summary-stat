@@ -1,3 +1,4 @@
 ━━━ Wilson bounds ━━━
   ✓ as in hedgehog passed 10000 tests.
-  ✓ 1 succeeded.
+  ✓ low <= high passed 10000 tests.
+  ✓ 2 succeeded.
