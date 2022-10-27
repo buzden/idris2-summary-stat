@@ -124,6 +124,22 @@ export
 Show (So x) where
   show _ = "Oh"
 
+export
+somewhatInteger : Gen Integer
+somewhatInteger = choice
+  [ integer $ constantFrom 0 (-1000000000000) 1000000000000
+  , cast <$> numericDouble False False
+  , foldl (+) 0 . map cast <$> vect 5 (numericDouble False False)
+  ]
+
+export
+somewhatNat : Gen Nat
+somewhatNat = choice
+  [ nat $ constant 0 1000000000000
+  , cast <$> numericDouble False False
+  , foldl (+) 0 . map cast <$> vect 5 (numericDouble False False)
+  ]
+
 --- Special common properties ---
 
 export

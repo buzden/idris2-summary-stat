@@ -155,6 +155,18 @@ public export
 strengthenBounds : {l', u' : _} -> DoubleBetween l u -> Maybe $ DoubleBetween l' u'
 strengthenBounds = maybeBoundedDouble . cast
 
+export
+Cast Nat (DoubleBetween 0 PosInf) where
+  cast n = BoundedDouble (cast n) @{believe_me Oh} @{believe_me Oh}
+
+export %inline
+fromNat : Nat -> DoubleBetween 0 PosInf
+fromNat = cast
+
+export
+Cast Integer SolidDouble where
+  cast n = BoundedDouble (cast n) @{believe_me Oh} @{believe_me Oh}
+
 --- Literals syntax ---
 
 namespace MinimalBounds
