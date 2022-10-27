@@ -329,6 +329,10 @@ expRelaxed : DoubleBetween l u -> DoubleBetween 0 PosInf
 expRelaxed x = BoundedDouble (exp x.asDouble) @{believe_me Oh} @{believe_me Oh}
 
 export
+pow2 : DoubleBetween l u -> DoubleBetween (pow 2 l) (pow 2 u)
+pow2 x = BoundedDouble (pow 2 x.asDouble) @{believe_me Oh} @{believe_me Oh}
+
+export
 sin : FiniteDouble -> DoubleBetween (-1) 1
 sin x = BoundedDouble (sin x.asDouble) @{believe_me Oh} @{believe_me Oh}
 

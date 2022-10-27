@@ -4,7 +4,8 @@
   ✓ log passed 10000 tests.
   ✓ exp passed 10000 tests.
   ✓ expRelaxed passed 10000 tests.
-  ✓ 5 succeeded.
+  ✓ pow2 passed 10000 tests.
+  ✓ 6 succeeded.
 ━━━ believe_me const bounds ━━━
   ✓ sin passed 10000 tests.
   ✓ cos passed 10000 tests.

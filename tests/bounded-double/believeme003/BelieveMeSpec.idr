@@ -27,6 +27,7 @@ main = test
       , ("log",         pol_nneg_corr log)
       , ("exp",         pol_corr exp)
       , ("expRelaxed",  pol_corr expRelaxed)
+      , ("pow2",        pol_corr pow2)
       ]
   , "believe_me const bounds" `MkGroup`
       [ ("sin",  un_corr sin)
