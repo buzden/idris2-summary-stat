@@ -28,7 +28,7 @@ fitsPattern = isInfixOf
 
 testOptions : IO Options
 testOptions = do
-  onlies <- tail' <$> getArgs
+  onlies <- filter (not . null) . tail' <$> getArgs
   pure $
     { color := True
     , timing := True
