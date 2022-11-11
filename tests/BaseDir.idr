@@ -1,4 +1,7 @@
 module BaseDir
 
+import Test.Golden.RunnerHelper
+
 export
-baseTestsDir : String
+BaseTestsDir where
+  baseTestsDir = ?base_tests_dir
