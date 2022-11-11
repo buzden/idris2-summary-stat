@@ -11,7 +11,7 @@ prim_erfc : Double -> Double
 
 export
 erfc : SolidDouble -> DoubleBetween 0 2
-erfc x = BoundedDouble (prim_erfc x.asDouble) @{believe_me Oh} @{believe_me Oh}
+erfc = roughlyFit . prim_erfc . cast
 
 export
 erf : SolidDouble -> DoubleBetween (-1) 1
@@ -33,7 +33,7 @@ invnormcdf' p =
               else if p < pLow     then closeToLowBound p
               else if p.inv < pLow then - closeToLowBound p.inv
               else                      middling p
-    in BoundedDouble res @{believe_me Oh} @{believe_me Oh}
+    in roughlyFit res
 
   where
     pLow : Probability
@@ -91,7 +91,7 @@ invnormcdf p =
     x = x.asDouble
     u = e * sqrt (2*pi) * exp (x*x / 2)
     x' = x - u / (1 + x * u / 2)
-    in BoundedDouble x' @{believe_me Oh} @{believe_me Oh}
+    in roughlyFit x'
 
 export
 inverfc : DoubleBetween 0 2 -> SolidDouble
