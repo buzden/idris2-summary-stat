@@ -37,7 +37,7 @@ wilsonBounds confidence count successes =
     high = (midpoint + offset) / denominator
 
   in if low == low && high == high
-       then mapHom (\x => fromDouble x @{believe_me Oh}) (low, high)
+       then mapHom (P . roughlyFit) (low, high)
        else (0, 1) -- we've gone too close to infinite `z`
 
 --- Performing some actions while having statistical significance of coverage test ---
