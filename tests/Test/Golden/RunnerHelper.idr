@@ -45,14 +45,21 @@ export
 TestPoolLike TestPool where
   toTestPool = pure
 
-public export
-data TestPools : Type where
-  Nil  : TestPools
+export
+data TestPools = MkTestPools (List $ IO TestPool)
+
+namespace TestPools
+
+  export
+  Nil : TestPools
+  Nil = MkTestPools []
+
+  export
   (::) : TestPoolLike a => a -> TestPools -> TestPools
+  x :: MkTestPools xs = MkTestPools $ toTestPool x :: xs
 
 toList : TestPools -> List $ IO TestPool
-toList []      = []
-toList (x::xs) = toTestPool x :: toList xs
+toList $ MkTestPools xs = xs
 
 --- Facilities for user's convenience ---
 
