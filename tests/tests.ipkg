@@ -11,4 +11,4 @@ executable = runtests
 prebuild  = "sh buildhook pre"
 postbuild = "sh buildhook post"
 
-depends = test
+depends = golden-runner-helper

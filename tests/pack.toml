@@ -1,6 +1,3 @@
-[meta]
-toplevel = false
-
 [custom.all.common-definitions-for-tests]
 type = "local"
 path = "common"
