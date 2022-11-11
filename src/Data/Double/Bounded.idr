@@ -132,6 +132,14 @@ maybeBoundedDouble x with (lower <= x) proof lx
     _ | True  = Just $ BoundedDouble x @{eqToSo lx} @{eqToSo xu}
 
 public export
+roughlyFit : {l, u : _} -> (0 _ : So $ l <= u) => (x : Double) -> DoubleBetween l u
+roughlyFit @{lu} x with (x <= u) proof xu
+  _ | False = BoundedDouble u @{lu} @{lteRefl @{lteNotNaNR @{lu}}}
+  _ | True with (l <= x) proof lx
+    _ | False = BoundedDouble l @{lteRefl @{lteNotNaNL @{lu}}}
+    _ | True  = BoundedDouble x @{eqToSo lx} @{eqToSo xu}
+
+public export
 Cast (DoubleBetween l u) Double where
   cast $ BoundedDouble x = x
 
@@ -308,11 +316,7 @@ export
       DoubleBetween
         (min6 (l/l') (l/u') (u/l') (u/u') (l/zormin l' u') (u/zormin l' u'))
         (max6 (l/l') (l/u') (u/l') (u/u') (l/zormin l' u') (u/zormin l' u'))
-BoundedDouble x / BoundedDouble y = fit (x / y) where
-  fit : {ll, uu : Double} -> (x : Double) -> DoubleBetween ll uu
-  fit x = do
-    let x = if x < ll then ll else if uu < x then uu else x
-    BoundedDouble x @{believe_me Oh} @{believe_me Oh}
+BoundedDouble x / BoundedDouble y = roughlyFit @{believe_me Oh} (x / y)
 
 export
 negate : DoubleBetween l u -> DoubleBetween (-u) (-l)
