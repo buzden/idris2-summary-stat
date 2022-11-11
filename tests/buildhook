@@ -6,9 +6,15 @@ output="BaseDir.idr"
 
 echo "module BaseDir" > $output
 echo >> $output
+echo "import Test.Golden.RunnerHelper" >> $output
+echo >> $output
 echo "export" >> $output
-echo "baseTestsDir : String" >> $output
+echo "BaseTestsDir where" >> $output
+
+echo -n "  baseTestsDir = " >> $output
 
 if [ "$1" = "pre" ]; then
-  echo "baseTestsDir = \"$(pwd)\"" >> $output
+  echo "\"$(pwd)\"" >> $output
+else
+  echo "?base_tests_dir" >> $output
 fi

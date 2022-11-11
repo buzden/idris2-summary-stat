@@ -2,48 +2,13 @@ module Runner
 
 import BaseDir
 
-import Data.Maybe
-import Data.String
-
-import Test.Golden
-
-import System
-import System.Directory
-import System.File
-
-atDir : (poolName : String) -> (dir : String) -> IO TestPool
-atDir poolName dir = do
-  True <- exists dir
-    | False => emptyPool
-  Right (_::_) <- listDir dir
-    | _ => emptyPool
-  testsInDir dir (not . isPrefixOf "_") poolName [] Nothing
-
-  where
-    emptyPool : IO TestPool
-    emptyPool = pure $ MkTestPool poolName [] Nothing []
-
-fitsPattern : (pattern, test : String) -> Bool
-fitsPattern = isInfixOf
-
-testOptions : IO Options
-testOptions = do
-  onlies <- filter (not . null) . tail' <$> getArgs
-  pure $
-    { color := True
-    , timing := True
-    , interactive := True
-    , failureFile := Just "failures"
-    , onlyNames := onlies <&> \patterns, test => any (`fitsPattern` test) patterns
-    } (initOptions "idris2" True)
+import Test.Golden.RunnerHelper
 
 main : IO ()
-main = do
-  ignore $ changeDir baseTestsDir
-  runnerWith !testOptions $
-    [ !("Common facilities" `atDir` "common")
-    , !("Bounded Double" `atDir` "bounded-double")
-    , !("Error function" `atDir` "error-function")
-    , !("Probability type" `atDir` "probability")
-    , !("Confidence interval" `atDir` "confidence-interval")
-    ]
+main = goldenRunner
+  [ "Common facilities" `atDir` "common"
+  , "Bounded Double" `atDir` "bounded-double"
+  , "Error function" `atDir` "error-function"
+  , "Probability type" `atDir` "probability"
+  , "Confidence interval" `atDir` "confidence-interval"
+  ]
