@@ -4,6 +4,8 @@ version = 0.1.0
 
 authors = "Denis Buzdalov"
 
+license = "Apache-2.0"
+
 brief = "Facilities for summary statistics"
 
 modules
