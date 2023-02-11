@@ -1,6 +1,6 @@
 rm -rf build/
 
-pack -q install-deps test.ipkg && \
-$1 --build test.ipkg
+flock "$1" pack -q install-deps test.ipkg && \
+idris2 --build test.ipkg
 
 rm -rf build/
