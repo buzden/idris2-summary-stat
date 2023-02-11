@@ -1,9 +1,0 @@
-package a-summary-stat-test
-
-depends = summary-stat
-        , hedgehog
-        , common-definitions-for-tests
-
-main = BelieveMeSpec
-
-executable = test

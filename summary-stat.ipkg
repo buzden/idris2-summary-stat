@@ -9,8 +9,7 @@ license = "Apache-2.0"
 brief = "Facilities for summary statistics"
 
 modules
-  = Data.Double.Bounded
-  , Data.Functor.TraverseSt
+  = Data.Functor.TraverseSt
 
   , Statistics.Confidence
   , Statistics.Erf
@@ -18,4 +17,5 @@ modules
 
 sourcedir = "src"
 
-depends = contrib
+depends = bounded-doubles
+        , contrib
