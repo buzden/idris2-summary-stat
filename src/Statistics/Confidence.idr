@@ -103,10 +103,14 @@ public export %inline
 CoverageTestResult : Type
 CoverageTestResult = Maybe SignificantBounds
 
+public export
+DefaultConfidence : Probability
+DefaultConfidence = 1/1000000000
+
 export
 checkCoverageConditions :
   TraversableSt t =>
-  {default (1/1000000000) confidence : Probability} ->
+  {default DefaultConfidence confidence : Probability} ->
   Vect n (CoverageTest a) ->
   t a ->
   t $ Vect n CoverageTestResult
@@ -133,3 +137,12 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
                       else if                 wHigh < minP  then Just $ LowerBoundViolated wHigh
                       else                                       Nothing
         (pr, confRes)
+
+export %inline
+checkCoverageCondition :
+  TraversableSt t =>
+  {default DefaultConfidence confidence : Probability} ->
+  CoverageTest a ->
+  t a ->
+  t CoverageTestResult
+checkCoverageCondition ct = map @{FromTraversableSt} head . checkCoverageConditions {confidence} [ct]

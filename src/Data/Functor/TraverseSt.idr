@@ -38,3 +38,9 @@ TraversableSt LazyList where
 public export
 Traversable f => TraversableSt f where
   mapSt f s = evalState s . traverse (ST . pure .: f)
+
+namespace Functor
+
+  public export
+  [FromTraversableSt] TraversableSt f => Functor f where
+    map f = mapSt (const . pure . f) ()
