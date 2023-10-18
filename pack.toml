@@ -1,6 +1,3 @@
-[install]
-whitelist = [ "summary-stat-tests" ]
-
 [custom.all.summary-stat]
 type = "local"
 path = "."
