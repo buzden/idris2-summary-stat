@@ -1,8 +1,9 @@
 module Statistics.Confidence
 
+import Data.Fin
+
 import public Data.Functor.TraverseSt
 
-import Data.DPair
 import public Data.Nat
 import public Data.Vect
 
@@ -118,25 +119,23 @@ checkCoverageConditions :
 checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults where
 
   data PastResults : Type where
-    R : (attempts : Nat) -> (successes : Vect n $ Subset Nat (`LTE` attempts)) -> PastResults
+    R : (attempts : Nat) -> (successes : Vect n $ Fin $ S attempts) -> PastResults
 
   initialResults : PastResults
-  initialResults = R 0 $ coverageTests <&> const (0 `Element` LTEZero)
+  initialResults = R 0 $ coverageTests <&> const 0
 
   checkCoverageOnce : a -> PastResults -> (PastResults, Vect n CoverageTestResult)
   checkCoverageOnce x $ R prevAttempts prevResults = do
     let %inline currAttempts : Nat; currAttempts = S prevAttempts
     mapFst (R currAttempts) $ unzip $ coverageTests `zip` prevResults <&>
-      \(Cover minP maxP cond, Element prevSucc _) => do
-        let pr@(Element currSucc _) = if cond x
-                                       then S prevSucc `Element` LTESucc %search
-                                       else prevSucc   `Element` lteSuccRight %search
-        let (wLow, wHigh) = wilsonBounds confidence currAttempts $ ratio currSucc currAttempts
+      \(Cover minP maxP cond, prevSucc) => do
+        let currSucc = if cond x then FS prevSucc else weaken prevSucc
+        let (wLow, wHigh) = wilsonBounds confidence currAttempts $ successesRatio currSucc
         let confRes = if      wLow >= minP && wHigh <= maxP then Just BoundsOk
                       else if wLow > maxP                   then Just $ UpperBoundViolated wLow
                       else if                 wHigh < minP  then Just $ LowerBoundViolated wHigh
                       else                                       Nothing
-        (pr, confRes)
+        (currSucc, confRes)
 
 export %inline
 checkCoverageCondition :
