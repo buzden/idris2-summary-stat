@@ -108,6 +108,10 @@ public export
 DefaultConfidence : Probability
 DefaultConfidence = 1/1000000000
 
+%transform "weaken-neutral" weaken k = believe_me k
+%transform "weakenN-neutral" weakenN m k = believe_me k
+%transform "finToNat-neutral" finToNat n = believe_me n
+
 export
 checkCoverageConditions :
   TraversableSt t =>
