@@ -18,5 +18,6 @@ modules
 sourcedir = "src"
 builddir = ".build"
 
+langversion >= 0.7.0
+
 depends = bounded-doubles
-        , contrib
