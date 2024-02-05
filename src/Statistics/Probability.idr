@@ -3,7 +3,6 @@ module Statistics.Probability
 import public Data.Double.Bounded
 
 import Data.Fin
-import Data.Fin.Extra
 import Data.Nat
 
 %default total
@@ -60,10 +59,15 @@ export
 ratio : (num, den : Nat) -> (0 _ : num `LTE` den) => (0 _ : IsSucc den) => Probability
 ratio num den = (cast num / cast den) @{believe_me Oh}
 
+-- Similar function is present in `Data.Fin.Extra`, but it is in the `contrib`
+finToNatSmallerThanBound : (n : Fin m) -> finToNat n `LT` m
+finToNatSmallerThanBound FZ     = LTESucc LTEZero
+finToNatSmallerThanBound (FS x) = LTESucc $ finToNatSmallerThanBound x
+
 export
 successesRatio : {den : Nat} -> (num : Fin $ S den) -> (0 _ : IsSucc den) => Probability
 successesRatio num = do
-  let LTESucc _ = elemSmallerThanBound num
+  let LTESucc _ = finToNatSmallerThanBound num
   ratio (finToNat num) den
 
 public export
