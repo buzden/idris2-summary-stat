@@ -26,6 +26,8 @@ normcdf : SolidDouble -> Probability
 normcdf x = P $ erfc (-x / sqrt 2) / 2
 
 -- calculation with precision only up to 10^9
+-- this implementation does not require error function implementation (which now is implemented through a `%foreign` function)
+export
 invnormcdf' : Probability -> SolidDouble
 invnormcdf' p =
     let res = if      p == 0       then NegInf
