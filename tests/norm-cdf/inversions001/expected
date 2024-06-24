@@ -1,0 +1,8 @@
+━━━ inversions ━━━
+  ✓ normcdf passed 10000 tests.
+  ✓ normcdf @{Rough} passed 10000 tests.
+  ✓ 2 succeeded.
+━━━ anti-inversions ━━━
+  ✓ normcdf passed 10000 tests.
+  ✓ normcdf @{Rough} passed 10000 tests.
+  ✓ 2 succeeded.

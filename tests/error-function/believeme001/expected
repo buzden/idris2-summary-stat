@@ -1,10 +1,10 @@
 ━━━ believe_me ━━━
   ✓ erfc bounds passed 10000 tests.
-  ✓ invnormcdf passed 10000 tests.
-  ✓ 2 succeeded.
+  ✓ 1 succeeded.
 ━━━ other bounds ━━━
   ✓ erf passed 10000 tests.
-  ✓ normcdf passed 10000 tests.
   ✓ inverfc passed 10000 tests.
+  ✓ inverfc @{Rough} passed 10000 tests.
   ✓ inverf passed 10000 tests.
-  ✓ 4 succeeded.
+  ✓ inverf @{Rough} passed 10000 tests.
+  ✓ 5 succeeded.

@@ -3,13 +3,15 @@ module BelieveMeSpec
 import Hedgehog
 
 import Statistics.Confidence
+import Statistics.Norm.Rough
+import Statistics.Norm.Precise
 
 import Test.Common
 
 MaxWilsonCount : Nat
 MaxWilsonCount = 1000000
 
-wilsonBounds_corr : Property
+wilsonBounds_corr : InvNormCDF => Property
 wilsonBounds_corr = property $ do
   confidence <- forAll anyProbability
   count' <- forAll $ nat $ constant 0 MaxWilsonCount
@@ -38,6 +40,7 @@ main : IO ()
 main = test
   [ "believe_me" `MkGroup`
       [ ("wilsonBounds", wilsonBounds_corr)
+      , ("wilsonBounds @{Rough}", wilsonBounds_corr @{Rough})
       , ("coverBetween", coverBetween_corr)
       ]
   ]

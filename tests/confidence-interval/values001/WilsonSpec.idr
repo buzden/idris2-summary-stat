@@ -6,6 +6,8 @@ import Hedgehog
 import Hedgehog.Internal.Property.Hack
 
 import Statistics.Confidence
+import Statistics.Norm.Precise
+import Statistics.Norm.Rough
 
 import Test.Common
 
@@ -15,7 +17,7 @@ MaxCount = 1000000000000
 AcceptanceTolerance : Double
 AcceptanceTolerance = 1.0e-15
 
-wilsonBounds_asHedgehog : Property
+wilsonBounds_asHedgehog : InvNormCDF => Property
 wilsonBounds_asHedgehog = property $ do
   count      <- forAll $ nat $ constant 1 MaxCount
   positives  <- forAll $ nat $ constant 0 count
@@ -32,6 +34,7 @@ wilsonBounds_asHedgehog = property $ do
                                              (P $ BoundedDouble acceptance @{believe_me Oh} @{believe_me Oh})
                                              count
                                              (ratio positives count @{believe_me LTEZero} @{believe_me ItIsSucc})
+                                             @{%search}
                                              @{believe_me ItIsSucc}
 
   annotate "from Hedgehog: \{show fromHedgehog}"
@@ -44,7 +47,7 @@ wilsonBounds_asHedgehog = property $ do
   diff (fst fromHedgehog) eqUpToEps (fst fromSummaryStat)
   diff (snd fromHedgehog) eqUpToEps (snd fromSummaryStat)
 
-wilsonBounds_low_leq_high : Property
+wilsonBounds_low_leq_high : InvNormCDF => Property
 wilsonBounds_low_leq_high = property $ do
   count      <- forAll $ nat $ constant 1 MaxCount
   positives  <- forAll $ nat $ constant 0 count
@@ -58,6 +61,7 @@ wilsonBounds_low_leq_high = property $ do
                                       (P $ BoundedDouble acceptance @{believe_me Oh} @{believe_me Oh})
                                       count
                                       (ratio positives count @{believe_me $ LTEZero {right=Z}} @{believe_me $ ItIsSucc {n=1}})
+                                      @{%search}
                                       @{believe_me $ ItIsSucc {n=1}}
 
   annotate "from summary-stat: \{show (lo, hi)}"
@@ -69,5 +73,9 @@ main = test
   [ "Wilson bounds" `MkGroup`
       [ ("as in hedgehog", wilsonBounds_asHedgehog)
       , ("low <= high", wilsonBounds_low_leq_high)
+      ]
+  , "Wilson bounds @{Rough}" `MkGroup`
+      [ ("as in hedgehog", wilsonBounds_asHedgehog @{Rough})
+      , ("low <= high", wilsonBounds_low_leq_high @{Rough})
       ]
   ]
