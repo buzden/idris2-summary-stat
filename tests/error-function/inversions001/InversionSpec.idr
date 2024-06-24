@@ -3,14 +3,12 @@ module InversionSpec
 import Hedgehog
 
 import Statistics.Erf
+import Statistics.Norm.Precise
+import Statistics.Norm.Rough
 
 import Test.Common
 
 namespace Forward
-
-  %hint
-  e : Eps
-  e = MkEps 1.0e-11
 
   domainLimit : Double
   domainLimit = 3
@@ -19,60 +17,49 @@ namespace Forward
   erfDouble = relaxToSolid <$> anyBoundedDouble (-domainLimit) domainLimit
 
   export
-  erf_inv_corr : Property
+  erf_inv_corr : InvNormCDF => Eps => Property
   erf_inv_corr = property $ do
     x <- forAll erfDouble
     annotateShow $ erf x
     diff (inverf $ erf x) eqUpToEps x
 
   export
-  erfc_inv_corr : Property
+  erfc_inv_corr : InvNormCDF => Eps => Property
   erfc_inv_corr = property $ do
     x <- forAll erfDouble
     annotateShow $ erfc x
     diff (inverfc $ erfc x) eqUpToEps x
 
-  export
-  normcdf_inv_corr : Property
-  normcdf_inv_corr = property $ do
-    x <- forAll erfDouble
-    annotateShow $ normcdf x
-    diff (invnormcdf $ normcdf x) eqUpToEps x
-
 namespace Backward
 
-  %hint
-  e : Eps
-  e = MkEps 1.0e-15
-
   export
-  inv_erf_corr : Property
+  inv_erf_corr : InvNormCDF => Eps => Property
   inv_erf_corr = property $ do
     x <- forAll $ anyBoundedDouble _ _
     diff (erf $ inverf x) eqUpToEps x
 
   export
-  inv_erfc_corr : Property
+  inv_erfc_corr : InvNormCDF => Eps => Property
   inv_erfc_corr = property $ do
     x <- forAll $ anyBoundedDouble _ _
     diff (erfc $ inverfc x) eqUpToEps x
 
-  export
-  inv_normcdf_corr : Property
-  inv_normcdf_corr = property $ do
-    x <- forAll anyProbability
-    diff (normcdf $ invnormcdf x) eqUpToEps x
-
 main : IO ()
 main = test
-  [ "inversions" `MkGroup`
+  [ "inversions" `MkGroup` let %hint e : Eps; e = MkEps 1.0e-11 in
       [ ("erf", erf_inv_corr)
       , ("erfc", erfc_inv_corr)
-      , ("normcdf", normcdf_inv_corr)
       ]
-  , "anti-inversions" `MkGroup`
+  , "anti-inversions" `MkGroup` let %hint e : Eps; e = MkEps 1.0e-15 in
       [ ("erf", inv_erf_corr)
       , ("erfc", inv_erfc_corr)
-      , ("normcdf", inv_normcdf_corr)
+      ]
+  , "inversions @{Rough}" `MkGroup` let %hint e : Eps; e = MkEps 1.0e-8 in
+      [ ("erf", erf_inv_corr @{Rough})
+      , ("erfc", erfc_inv_corr @{Rough})
+      ]
+  , "anti-inversions @{Rough}" `MkGroup` let %hint e : Eps; e = MkEps 1.0e-9 in
+      [ ("erf", inv_erf_corr @{Rough})
+      , ("erfc", inv_erfc_corr @{Rough})
       ]
   ]

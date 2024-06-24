@@ -6,8 +6,10 @@ import Data.DPair
 import public Data.Nat
 import public Data.Vect
 
-import Statistics.Erf
+import public Statistics.Norm.Rough
 import public Statistics.Probability
+
+-- This module reexports the rough implementation for `InvNormCDF` for compatility reasons, this may be changed in the future
 
 %default total
 
@@ -15,6 +17,7 @@ import public Statistics.Probability
 -- https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval
 export
 wilsonBounds :
+  InvNormCDF =>
   (confidence : Probability) ->
   (count : Nat) ->
   (0 _ : IsSucc count) =>
@@ -110,6 +113,7 @@ DefaultConfidence = 1/1000000000
 export
 checkCoverageConditions :
   TraversableSt t =>
+  InvNormCDF =>
   {default DefaultConfidence confidence : Probability} ->
   Vect n (CoverageTest a) ->
   t a ->
@@ -141,6 +145,7 @@ checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults w
 export %inline
 checkCoverageCondition :
   TraversableSt t =>
+  InvNormCDF =>
   {default DefaultConfidence confidence : Probability} ->
   CoverageTest a ->
   t a ->

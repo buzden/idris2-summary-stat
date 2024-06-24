@@ -13,6 +13,9 @@ modules
 
   , Statistics.Confidence
   , Statistics.Erf
+  , Statistics.Norm
+  , Statistics.Norm.Precise
+  , Statistics.Norm.Rough
   , Statistics.Probability
 
 sourcedir = "src"
