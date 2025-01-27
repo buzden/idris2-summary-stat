@@ -4,6 +4,7 @@ import public Data.Functor.TraverseSt
 
 import Data.DPair
 import public Data.Nat
+import Data.String
 import public Data.Vect
 
 import public Statistics.Norm.Rough
@@ -43,14 +44,32 @@ wilsonBounds confidence count successes =
        then mapHom (P . roughlyFit) (low, high)
        else (0, 1) -- we've gone too close to infinite `z`
 
---- Performing some actions while having statistical significance of coverage test ---
+--- Stuff for expressing what and how should be tested ---
 
 public export
 record CoverageTest a where
   constructor Cover
-  minimalProbability, maximalProbability : Probability
-  {auto 0 minMaxCorrect : So $ minimalProbability <= maximalProbability}
+  checkedProbability : (Probability, Probability)
+  {auto 0 minMaxCorrect : So $ fst checkedProbability <= snd checkedProbability}
   successCondition : a -> Bool
+
+namespace CoverageTest
+
+  public export %inline
+  minimalProbability : CoverageTest a -> Probability
+  minimalProbability = fst . checkedProbability
+
+  public export %inline
+  (.minimalProbability) : CoverageTest a -> Probability
+  (.minimalProbability) = minimalProbability
+
+  public export %inline
+  maximalProbability : CoverageTest a -> Probability
+  maximalProbability = snd . checkedProbability
+
+  public export %inline
+  (.maximalProbability) : CoverageTest a -> Probability
+  (.maximalProbability) = maximalProbability
 
 namespace CoverageTest
 
@@ -68,7 +87,7 @@ namespace CoverageTest
     let minP = minP * tolerance
     let maxP = inv $ maxP.inv * tolerance
     let maxP = if maxP <= minP then minP else maxP -- just in case `maxP` is a non-normalised very small value
-    Cover minP maxP @{believe_me Oh}
+    Cover (minP, maxP) @{believe_me Oh}
 
   export
   coverMin : {default DefaultTolerance tolerance : Probability} ->
@@ -83,6 +102,74 @@ namespace CoverageTest
               (successCondition : a -> Bool) ->
               CoverageTest a
   coverWith singleP = coverBetween {tolerance} singleP singleP
+
+public export
+DefaultConfidence : Probability
+DefaultConfidence = 1/1000000000
+
+--- Coverage condition checker with low-level intermediate results ---
+
+public export
+record CoverageTestState where
+  constructor MkCoverageTestState
+  testedBounds : (Probability, Probability)
+  wilsonBounds : (Probability, Probability)
+
+export
+[NoAnalysis] Interpolation CoverageTestState where
+  interpolate $ MkCoverageTestState (minP, maxP) (wLow, wHigh) = do
+    let ss = if minP == maxP && wLow /= minP && wHigh /= maxP
+               then [ (wLow , "[\{show wLow}")
+                    , (minP , "(\{show minP})")
+                    , (wHigh, "\{show wHigh}]")
+                    ]
+               else [ (minP , "(\{show minP}")
+                    , (wLow , "[\{show wLow}")
+                    , (wHigh, "\{show wHigh}]")
+                    , (maxP , "\{show maxP})")
+                    ]
+    unwords $ map snd $ sortBy (comparing fst) ss
+
+export
+[Means] Interpolation CoverageTestState where
+  interpolate $ MkCoverageTestState expected wilson = "expected: \{interpolatePair expected}, wilson: \{interpolatePair wilson}" where
+    interpolatePair : (Probability, Probability) -> String
+    interpolatePair (lo, hi) = do
+      let lo = lo.value
+          hi = hi.value
+      if lo == hi then "\{show lo}" else with Bounded.(+) with Bounded.(/) with Bounded.(-) do
+        let mi = (lo + hi) / 2
+        let di = hi - mi
+        "\{show mi} ± \{show di}"
+
+export
+checkCoverageConditions' :
+  TraversableSt t =>
+  InvNormCDF =>
+  {default DefaultConfidence confidence : Probability} ->
+  Vect n (CoverageTest a) ->
+  t a ->
+  t $ Vect n CoverageTestState
+
+checkCoverageConditions' coverageTests = mapSt checkCoverageOnce initialResults where
+
+  data PastResults : Type where
+    R : (attempts : Nat) -> (successes : Vect n $ Subset Nat (`LTE` attempts)) -> PastResults
+
+  initialResults : PastResults
+  initialResults = R 0 $ coverageTests <&> const (0 `Element` LTEZero)
+
+  checkCoverageOnce : a -> PastResults -> (PastResults, Vect n CoverageTestState)
+  checkCoverageOnce x $ R prevAttempts prevResults = do
+    let %inline currAttempts : Nat; currAttempts = S prevAttempts
+    mapFst (R currAttempts) $ unzip $ coverageTests `zip` prevResults <&>
+      \(Cover checkedP@(minP, maxP) cond, Element prevSucc _) => do
+        let pr@(Element currSucc _) = if cond x
+                                        then S prevSucc `Element` LTESucc %search
+                                        else prevSucc   `Element` lteSuccRight %search
+        (pr, MkCoverageTestState checkedP $ wilsonBounds confidence currAttempts $ ratio currSucc currAttempts)
+
+--- Coverage condition checkers with simpler results ---
 
 public export
 data SignificantBounds
@@ -106,11 +193,23 @@ public export %inline
 CoverageTestResult : Type
 CoverageTestResult = Maybe SignificantBounds
 
-public export
-DefaultConfidence : Probability
-DefaultConfidence = 1/1000000000
+export
+coverageTestResult : CoverageTestState -> CoverageTestResult
+coverageTestResult $ MkCoverageTestState (minP, maxP) (wLow, wHigh) =
+  if      wLow >= minP && wHigh <= maxP then Just BoundsOk
+  else if wLow > maxP                   then Just $ UpperBoundViolated wLow
+  else if                 wHigh < minP  then Just $ LowerBoundViolated wHigh
+  else                                       Nothing
 
 export
+Interpolation CoverageTestState where
+  interpolate cts@(MkCoverageTestState (minP, maxP) (wLow, wHigh)) = case coverageTestResult cts of
+    Just BoundsOk               => "ok"
+    Just (UpperBoundViolated _) => "(..., \{show maxP}) --> \{show wLow}"
+    Just (LowerBoundViolated _) => "\{show wLow} <-- (\{show minP}, ...)"
+    Nothing                     => "\{show wLow} .. \{show wHigh} still covers (\{show minP}, \{show maxP})"
+
+export %inline
 checkCoverageConditions :
   TraversableSt t =>
   InvNormCDF =>
@@ -118,29 +217,7 @@ checkCoverageConditions :
   Vect n (CoverageTest a) ->
   t a ->
   t $ Vect n CoverageTestResult
-
-checkCoverageConditions coverageTests = mapSt checkCoverageOnce initialResults where
-
-  data PastResults : Type where
-    R : (attempts : Nat) -> (successes : Vect n $ Subset Nat (`LTE` attempts)) -> PastResults
-
-  initialResults : PastResults
-  initialResults = R 0 $ coverageTests <&> const (0 `Element` LTEZero)
-
-  checkCoverageOnce : a -> PastResults -> (PastResults, Vect n CoverageTestResult)
-  checkCoverageOnce x $ R prevAttempts prevResults = do
-    let %inline currAttempts : Nat; currAttempts = S prevAttempts
-    mapFst (R currAttempts) $ unzip $ coverageTests `zip` prevResults <&>
-      \(Cover minP maxP cond, Element prevSucc _) => do
-        let pr@(Element currSucc _) = if cond x
-                                       then S prevSucc `Element` LTESucc %search
-                                       else prevSucc   `Element` lteSuccRight %search
-        let (wLow, wHigh) = wilsonBounds confidence currAttempts $ ratio currSucc currAttempts
-        let confRes = if      wLow >= minP && wHigh <= maxP then Just BoundsOk
-                      else if wLow > maxP                   then Just $ UpperBoundViolated wLow
-                      else if                 wHigh < minP  then Just $ LowerBoundViolated wHigh
-                      else                                       Nothing
-        (pr, confRes)
+checkCoverageConditions = map @{FromTraversableSt} (map coverageTestResult) .: checkCoverageConditions' {confidence}
 
 export %inline
 checkCoverageCondition :
