@@ -7,40 +7,64 @@ import Data.List.Lazy
 
 %default total
 
+-----------------
+--- Interface ---
+-----------------
+
 -- A particular case of sub-traversability with the state monad.
 -- This is not a full traverse because state is not returned,
 -- thus there is no way to demand the final state.
 -- This allows us to implement this interface for (potentially) infinite data types.
 public export
 interface TraversableSt f where
-  mapSt : (a -> s -> (s, b)) -> s -> f a -> f b
+  traverseSt : s -> (a -> s -> (s, b)) -> f a -> f b
+
+--------------------------------------
+--- Particular universal functions ---
+--------------------------------------
+
+export %inline
+withIndex : TraversableSt f => f a -> f (Nat, a)
+withIndex = traverseSt Z $ \x, n => (S n, n, x)
+
+export %inline
+(.withIndex) : TraversableSt f => f a -> f (Nat, a)
+(.withIndex) = withIndex
+
+------------------------------------------
+--- Implementations for standard types ---
+------------------------------------------
 
 public export
 TraversableSt Stream where
-  mapSt f s (x::xs) = do
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: mapSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 TraversableSt Colist where
-  mapSt _ _ []      = []
-  mapSt f s (x::xs) = do
+  traverseSt _ _ []      = []
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: mapSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 TraversableSt LazyList where
-  mapSt _ _ []      = []
-  mapSt f s (x::xs) = do
+  traverseSt _ _ []      = []
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: mapSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 Traversable f => TraversableSt f where
-  mapSt f s = evalState s . traverse (ST . pure .: f)
+  traverseSt s f = evalState s . traverse (ST . pure .: f)
+
+------------------------------------------------------
+--- Additional implementations of other interfaces ---
+------------------------------------------------------
 
 namespace Functor
 
   public export
   [FromTraversableSt] TraversableSt f => Functor f where
-    map f = mapSt (const . pure . f) ()
+    map f = traverseSt () $ const . pure . f
