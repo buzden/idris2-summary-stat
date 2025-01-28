@@ -17,7 +17,7 @@ import Data.List.Lazy
 -- This allows us to implement this interface for (potentially) infinite data types.
 public export
 interface TraversableSt f where
-  traverseSt : (a -> s -> (s, b)) -> s -> f a -> f b
+  traverseSt : s -> (a -> s -> (s, b)) -> f a -> f b
 
 --------------------------------------
 --- Particular universal functions ---
@@ -25,7 +25,7 @@ interface TraversableSt f where
 
 export %inline
 withIndex : TraversableSt f => f a -> f (Nat, a)
-withIndex = traverseSt (\x, n => (S n, n, x)) Z
+withIndex = traverseSt Z $ \x, n => (S n, n, x)
 
 export %inline
 (.withIndex) : TraversableSt f => f a -> f (Nat, a)
@@ -37,27 +37,27 @@ export %inline
 
 public export
 TraversableSt Stream where
-  traverseSt f s (x::xs) = do
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: traverseSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 TraversableSt Colist where
   traverseSt _ _ []      = []
-  traverseSt f s (x::xs) = do
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: traverseSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 TraversableSt LazyList where
   traverseSt _ _ []      = []
-  traverseSt f s (x::xs) = do
+  traverseSt s f (x::xs) = do
     let (s', y) = f x s
-    y :: traverseSt f s' xs
+    y :: traverseSt s' f xs
 
 public export
 Traversable f => TraversableSt f where
-  traverseSt f s = evalState s . traverse (ST . pure .: f)
+  traverseSt s f = evalState s . traverse (ST . pure .: f)
 
 ------------------------------------------------------
 --- Additional implementations of other interfaces ---
@@ -67,4 +67,4 @@ namespace Functor
 
   public export
   [FromTraversableSt] TraversableSt f => Functor f where
-    map f = traverseSt (const . pure . f) ()
+    map f = traverseSt () $ const . pure . f

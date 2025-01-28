@@ -151,7 +151,7 @@ checkCoverageConditions' :
   t a ->
   t $ Vect n CoverageTestState
 
-checkCoverageConditions' coverageTests = traverseSt checkCoverageOnce initialResults where
+checkCoverageConditions' coverageTests = traverseSt initialResults checkCoverageOnce where
 
   data PastResults : Type where
     R : (attempts : Nat) -> (successes : Vect n $ Subset Nat (`LTE` attempts)) -> PastResults
