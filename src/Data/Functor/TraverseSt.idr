@@ -7,6 +7,10 @@ import Data.List.Lazy
 
 %default total
 
+-----------------
+--- Interface ---
+-----------------
+
 -- A particular case of sub-traversability with the state monad.
 -- This is not a full traverse because state is not returned,
 -- thus there is no way to demand the final state.
@@ -14,6 +18,22 @@ import Data.List.Lazy
 public export
 interface TraversableSt f where
   mapSt : (a -> s -> (s, b)) -> s -> f a -> f b
+
+--------------------------------------
+--- Particular universal functions ---
+--------------------------------------
+
+export %inline
+withIndex : TraversableSt f => f a -> f (Nat, a)
+withIndex = mapSt (\x, n => (S n, n, x)) Z
+
+export %inline
+(.withIndex) : TraversableSt f => f a -> f (Nat, a)
+(.withIndex) = withIndex
+
+------------------------------------------
+--- Implementations for standard types ---
+------------------------------------------
 
 public export
 TraversableSt Stream where
@@ -38,6 +58,10 @@ TraversableSt LazyList where
 public export
 Traversable f => TraversableSt f where
   mapSt f s = evalState s . traverse (ST . pure .: f)
+
+------------------------------------------------------
+--- Additional implementations of other interfaces ---
+------------------------------------------------------
 
 namespace Functor
 
