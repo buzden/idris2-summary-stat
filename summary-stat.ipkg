@@ -9,9 +9,7 @@ license = "Apache-2.0"
 brief = "Facilities for summary statistics"
 
 modules
-  = Data.Functor.TraverseSt
-
-  , Statistics.Confidence
+  = Statistics.Confidence
   , Statistics.Erf
   , Statistics.Norm
   , Statistics.Norm.Precise
@@ -24,3 +22,4 @@ builddir = ".build"
 langversion >= 0.7.0
 
 depends = bounded-doubles
+        , weaker-traversals
