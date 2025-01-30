@@ -159,8 +159,8 @@ checkCoverageConditions' coverageTests = traverseSt initialResults checkCoverage
   initialResults : PastResults
   initialResults = R 0 $ coverageTests <&> const (0 `Element` LTEZero)
 
-  checkCoverageOnce : a -> PastResults -> (PastResults, Vect n CoverageTestState)
-  checkCoverageOnce x $ R prevAttempts prevResults = do
+  checkCoverageOnce : PastResults -> a -> (PastResults, Vect n CoverageTestState)
+  checkCoverageOnce (R prevAttempts prevResults) x = do
     let %inline currAttempts : Nat; currAttempts = S prevAttempts
     mapFst (R currAttempts) $ unzip $ coverageTests `zip` prevResults <&>
       \(Cover checkedP@(minP, maxP) cond, Element prevSucc _) => do
@@ -217,7 +217,7 @@ checkCoverageConditions :
   Vect n (CoverageTest a) ->
   t a ->
   t $ Vect n CoverageTestResult
-checkCoverageConditions = map @{FromTraversableSt} (map coverageTestResult) .: checkCoverageConditions' {confidence}
+checkCoverageConditions = map @{Compose} coverageTestResult .: checkCoverageConditions' {confidence}
 
 export %inline
 checkCoverageCondition :
@@ -227,4 +227,4 @@ checkCoverageCondition :
   CoverageTest a ->
   t a ->
   t CoverageTestResult
-checkCoverageCondition ct = map @{FromTraversableSt} head . checkCoverageConditions {confidence} [ct]
+checkCoverageCondition ct = map head . checkCoverageConditions {confidence} [ct]
